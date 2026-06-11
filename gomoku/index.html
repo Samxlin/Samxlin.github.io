@@ -17,22 +17,39 @@
       <button id="restart" class="restart" type="button">重新开始</button>
     </header>
 
-    <section class="game-card">
-      <div class="status-row">
-        <div id="status" class="status" aria-live="polite">
-          <span class="stone black"></span>
-          <span>黑方回合</span>
-        </div>
-        <p id="move-count">第 1 手</p>
+    <section id="lobby" class="lobby">
+      <div>
+        <p class="eyebrow">选择玩法</p>
+        <h2>和朋友下一局</h2>
+        <p>创建线上房间并分享链接，或在同一台设备轮流落子。</p>
       </div>
+      <div class="lobby-actions">
+        <button id="create-room" class="primary" type="button">创建联机房间</button>
+        <form id="join-form">
+          <input id="room-code-input" maxlength="6" autocomplete="off" placeholder="输入六位房间码" aria-label="房间码">
+          <button type="submit">加入房间</button>
+        </form>
+        <button id="local-game" type="button">本地双人</button>
+      </div>
+      <p id="lobby-message" class="message" aria-live="polite"></p>
+    </section>
 
+    <section id="game-card" class="game-card" hidden>
+      <div class="room-row">
+        <p id="mode-label" class="room-label">本地双人</p>
+        <button id="copy-link" type="button" hidden>复制邀请链接</button>
+        <button id="leave-room" type="button">返回大厅</button>
+      </div>
+      <div class="status-row">
+        <div id="status" class="status" aria-live="polite"></div>
+        <p id="move-count"></p>
+      </div>
       <div class="board-wrap">
         <canvas id="board" width="720" height="720" aria-label="五子棋棋盘"></canvas>
       </div>
-
       <div class="actions">
         <button id="undo" type="button">悔棋</button>
-        <p>双人同屏 · 先连成五子者胜</p>
+        <p id="game-hint">双人同屏 · 先连成五子者胜</p>
       </div>
     </section>
   </main>
@@ -41,11 +58,12 @@
     <div class="modal-card">
       <span id="winner-stone" class="stone black large"></span>
       <p class="eyebrow">本局结束</p>
-      <h2 id="winner-text">黑方获胜</h2>
+      <h2 id="winner-text"></h2>
       <button id="play-again" type="button">再来一局</button>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./game.js"></script>
 </body>
 </html>
