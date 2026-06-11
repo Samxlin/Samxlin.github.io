@@ -71,7 +71,7 @@ function startLocalGame() {
   modeLabel.textContent = "本地双人";
   copyLinkButton.hidden = true;
   undoButton.hidden = false;
-  undoButton.textContent = "悔一步";
+  undoButton.textContent = "悔棋";
   gameHint.textContent = "双人同屏 · 先连成五子者胜";
   showGame();
   resetLocalGame();
@@ -89,7 +89,7 @@ function applyRoom(nextRoom, showResult = true) {
   modeLabel.textContent = `房间 ${room.code}`;
   copyLinkButton.hidden = false;
   undoButton.hidden = false;
-  undoButton.textContent = "申请悔一步";
+  undoButton.textContent = "申请悔棋";
   gameHint.textContent = room.white_id ? playerDescription() : "等待朋友通过邀请链接加入…";
   showGame();
   updateStatus();
@@ -100,8 +100,8 @@ function applyRoom(nextRoom, showResult = true) {
 
 function playerDescription() {
   if (!room) return "";
-  if (userId === room.black_id) return "你执黑 · 黑方先行 · 输的人下一局执黑";
-  if (userId === room.white_id) return "你执白 · 输的人下一局执黑";
+  if (userId === room.black_id) return "你执黑 · 黑方先行";
+  if (userId === room.white_id) return "你执白 · 等待黑方先行";
   return "在线房间";
 }
 
@@ -113,8 +113,8 @@ function updateUndoRequest() {
   undoRequest.hidden = false;
   const isRequester = room.undo_requested_by === userId;
   undoRequestText.textContent = isRequester
-    ? "悔棋申请已发出，等对方点头。"
-    : "对方想撤回刚才那一步，要答应吗？";
+    ? "悔棋申请已发出，等待对方处理。"
+    : "对方申请撤回最后一步。";
   document.querySelector("#accept-undo").hidden = isRequester;
   document.querySelector("#reject-undo").hidden = isRequester;
 }
