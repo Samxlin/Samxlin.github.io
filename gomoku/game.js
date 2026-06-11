@@ -20,6 +20,8 @@ const lobbyMessage = document.querySelector("#lobby-message");
 const modeLabel = document.querySelector("#mode-label");
 const copyLinkButton = document.querySelector("#copy-link");
 const gameHint = document.querySelector("#game-hint");
+const undoRequest = document.querySelector("#undo-request");
+const undoRequestText = document.querySelector("#undo-request-text");
 
 let board = [];
 let moves = [];
@@ -51,6 +53,7 @@ function showLobby() {
   gameCard.hidden = true;
   document.querySelector("#restart").hidden = true;
   modal.hidden = true;
+  undoRequest.hidden = true;
 }
 
 function resetLocalGame() {
@@ -68,6 +71,7 @@ function startLocalGame() {
   modeLabel.textContent = "本地双人";
   copyLinkButton.hidden = true;
   undoButton.hidden = false;
+  undoButton.textContent = "悔一步";
   gameHint.textContent = "双人同屏 · 先连成五子者胜";
   showGame();
   resetLocalGame();
@@ -84,19 +88,35 @@ function applyRoom(nextRoom, showResult = true) {
   moves.forEach((move) => { board[move.row][move.col] = move.player; });
   modeLabel.textContent = `房间 ${room.code}`;
   copyLinkButton.hidden = false;
-  undoButton.hidden = true;
+  undoButton.hidden = false;
+  undoButton.textContent = "申请悔一步";
   gameHint.textContent = room.white_id ? playerDescription() : "等待朋友通过邀请链接加入…";
   showGame();
   updateStatus();
+  updateUndoRequest();
   draw();
   if (showResult && winner && !previousWinner) showWinner(winner);
 }
 
 function playerDescription() {
   if (!room) return "";
-  if (userId === room.black_id) return "你执黑 · 黑方先行";
-  if (userId === room.white_id) return "你执白 · 等待黑方先行";
+  if (userId === room.black_id) return "你执黑 · 黑方先行 · 输的人下一局执黑";
+  if (userId === room.white_id) return "你执白 · 输的人下一局执黑";
   return "在线房间";
+}
+
+function updateUndoRequest() {
+  if (mode !== "online" || !room || !room.undo_requested_by) {
+    undoRequest.hidden = true;
+    return;
+  }
+  undoRequest.hidden = false;
+  const isRequester = room.undo_requested_by === userId;
+  undoRequestText.textContent = isRequester
+    ? "悔棋申请已发出，等对方点头。"
+    : "对方想撤回刚才那一步，要答应吗？";
+  document.querySelector("#accept-undo").hidden = isRequester;
+  document.querySelector("#reject-undo").hidden = isRequester;
 }
 
 async function ensureSignedIn() {
@@ -165,6 +185,27 @@ async function playOnlineMove(row, col) {
   applyRoom(data);
 }
 
+async function requestOnlineUndo() {
+  const { data, error } = await client.rpc("request_gomoku_undo", { p_room_id: room.id });
+  if (error) {
+    gameHint.textContent = error.message;
+    return;
+  }
+  applyRoom(data, false);
+}
+
+async function respondOnlineUndo(accept) {
+  const { data, error } = await client.rpc("respond_gomoku_undo", {
+    p_room_id: room.id,
+    p_accept: accept
+  });
+  if (error) {
+    gameHint.textContent = error.message;
+    return;
+  }
+  applyRoom(data, false);
+}
+
 async function restartGame() {
   if (mode === "local") {
     resetLocalGame();
@@ -228,7 +269,13 @@ function updateStatus() {
   }
   status.innerHTML = `<span class="stone ${stoneClass}"></span><span>${text}</span>`;
   moveCount.textContent = winner ? `共 ${moves.length} 手` : `第 ${moves.length + 1} 手`;
-  undoButton.disabled = moves.length === 0 || winner !== 0;
+  if (mode === "online" && room) {
+    const lastMove = moves[moves.length - 1];
+    const myPlayer = userId === room.black_id ? 1 : userId === room.white_id ? 2 : 0;
+    undoButton.disabled = !lastMove || winner !== 0 || Boolean(room.undo_requested_by) || lastMove.player !== myPlayer;
+  } else {
+    undoButton.disabled = moves.length === 0 || winner !== 0;
+  }
 }
 
 function checkWin(row, col, player) {
@@ -273,12 +320,18 @@ canvas.addEventListener("pointerdown", async (event) => {
 });
 
 undoButton.addEventListener("click", () => {
+  if (mode === "online") {
+    requestOnlineUndo();
+    return;
+  }
   const lastMove = moves.pop();
   if (!lastMove || winner || mode !== "local") return;
   board[lastMove.row][lastMove.col] = 0;
   currentPlayer = lastMove.player;
   updateStatus(); draw();
 });
+document.querySelector("#accept-undo").addEventListener("click", () => respondOnlineUndo(true));
+document.querySelector("#reject-undo").addEventListener("click", () => respondOnlineUndo(false));
 
 document.querySelector("#create-room").addEventListener("click", createRoom);
 document.querySelector("#local-game").addEventListener("click", startLocalGame);

@@ -11,17 +11,17 @@
   <main class="game-shell">
     <header>
       <div>
-        <p class="eyebrow">GOMOKU · 五子棋</p>
-        <h1>落子，连成一线。</h1>
+        <p class="eyebrow">JUST US · 五子棋</p>
+        <h1>这一局，想和你下。</h1>
       </div>
       <button id="restart" class="restart" type="button">重新开始</button>
     </header>
 
     <section id="lobby" class="lobby">
       <div>
-        <p class="eyebrow">选择玩法</p>
-        <h2>和朋友下一局</h2>
-        <p>创建线上房间并分享链接，或在同一台设备轮流落子。</p>
+        <p class="eyebrow">发出邀请</p>
+        <h2>找个人，下一局</h2>
+        <p>输赢不重要，重要的是你愿意点开这个链接。</p>
       </div>
       <div class="lobby-actions">
         <button id="create-room" class="primary" type="button">创建联机房间</button>
@@ -49,7 +49,14 @@
       </div>
       <div class="actions">
         <button id="undo" type="button">悔棋</button>
-        <p id="game-hint">双人同屏 · 先连成五子者胜</p>
+        <p id="game-hint">先连成五子者胜 · 输的人下一局执黑</p>
+      </div>
+      <div id="undo-request" class="undo-request" hidden>
+        <p id="undo-request-text"></p>
+        <div>
+          <button id="accept-undo" class="primary" type="button">好吧，让你一步</button>
+          <button id="reject-undo" type="button">不许耍赖</button>
+        </div>
       </div>
     </section>
   </main>
