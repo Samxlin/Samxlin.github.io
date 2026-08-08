@@ -127,8 +127,8 @@ const initialiseField = (root: HTMLElement) => {
         z: Math.random(),
         vx: (Math.random() - 0.5) * 0.00008,
         vy: (Math.random() - 0.5) * 0.00006,
-        size: 0.35 + Math.random() * 1.1,
-        alpha: 0.04 + Math.random() * 0.13,
+        size: 0.45 + Math.random() * 1.3,
+        alpha: 0.065 + Math.random() * 0.16,
       });
     }
   };
@@ -167,22 +167,25 @@ const initialiseField = (root: HTMLElement) => {
     if (frequencyReadout) frequencyReadout.textContent = `${(1 + Math.sin(time * 0.18) * 0.0008).toFixed(3)} MHz`;
   };
 
-  const render = (timestamp: number) => {
-    if (destroyed || document.hidden || motionQuery.matches) {
+  const drawFrame = (timestamp: number, continueLoop: boolean) => {
+    if (destroyed || document.hidden) {
       rafId = null;
       return;
     }
 
-    const time = timestamp * 0.001;
-    const quietMode = document.body.classList.contains('moonlight');
+    const reducedMotion = motionQuery.matches;
+    const time = reducedMotion ? 0 : timestamp * 0.001;
+    const quietMode = reducedMotion || document.body.classList.contains('moonlight');
     context.clearRect(0, 0, width, height);
 
     pointer.x += (pointer.targetX - pointer.x) * 0.055;
     pointer.y += (pointer.targetY - pointer.y) * 0.055;
 
     for (const point of dust) {
-      point.x += point.vx * (quietMode ? 0.4 : 1);
-      point.y += point.vy * (quietMode ? 0.4 : 1);
+      if (!reducedMotion) {
+        point.x += point.vx * (quietMode ? 0.4 : 1);
+        point.y += point.vy * (quietMode ? 0.4 : 1);
+      }
 
       if (point.x < -0.03) point.x = 1.03;
       if (point.x > 1.03) point.x = -0.03;
@@ -208,7 +211,7 @@ const initialiseField = (root: HTMLElement) => {
     const rotationY = time * (quietMode ? 0.035 : 0.065) + scrollPhase * 0.1;
     const rotationX = -0.44 + Math.sin(time * 0.12) * 0.055 + scrollPhase * 0.04;
     const rotationZ = 0.22 + Math.cos(time * 0.08) * 0.045;
-    const fieldAlpha = compact ? 0.56 : 0.72;
+    const fieldAlpha = compact ? 0.68 : 0.96;
     const projected: ProjectedPoint[] = [];
 
     for (const point of torus) {
@@ -261,9 +264,9 @@ const initialiseField = (root: HTMLElement) => {
       if (!start || !end) continue;
 
       const gradient = context.createLinearGradient(start.x, start.y, end.x, end.y);
-      gradient.addColorStop(0, 'rgba(80,97,126,.035)');
-      gradient.addColorStop(0.5, 'rgba(105,101,137,.12)');
-      gradient.addColorStop(1, 'rgba(91,126,127,.025)');
+      gradient.addColorStop(0, 'rgba(80,97,126,.07)');
+      gradient.addColorStop(0.5, 'rgba(105,101,137,.22)');
+      gradient.addColorStop(1, 'rgba(91,126,127,.055)');
       context.strokeStyle = gradient;
       context.beginPath();
       context.moveTo(start.x, start.y);
@@ -303,7 +306,16 @@ const initialiseField = (root: HTMLElement) => {
     context.arc(centerX, centerY, base * 0.48, 0, Math.PI * 2);
     context.fill();
 
-    rafId = window.requestAnimationFrame(render);
+    rafId = continueLoop && !reducedMotion ? window.requestAnimationFrame(render) : null;
+  };
+
+  const render = (timestamp: number) => {
+    drawFrame(timestamp, true);
+  };
+
+  const renderStatic = () => {
+    resize();
+    drawFrame(0, false);
   };
 
   const stop = () => {
@@ -319,7 +331,14 @@ const initialiseField = (root: HTMLElement) => {
   };
 
   const start = () => {
-    if (destroyed || document.hidden || motionQuery.matches) return;
+    if (destroyed || document.hidden) return;
+
+    if (motionQuery.matches) {
+      if (statusReadout) statusReadout.textContent = 'quiet';
+      renderStatic();
+      return;
+    }
+
     if (rafId === null) rafId = window.requestAnimationFrame(render);
     if (hudTimer === null) hudTimer = window.setInterval(updateHud, 460);
   };
@@ -331,14 +350,14 @@ const initialiseField = (root: HTMLElement) => {
       return;
     }
 
-    if (statusReadout) statusReadout.textContent = 'stable';
+    if (statusReadout) statusReadout.textContent = motionQuery.matches ? 'quiet' : 'stable';
     start();
   };
 
   const handleMotionPreference = () => {
     if (motionQuery.matches) {
       stop();
-      context.clearRect(0, 0, width, height);
+      renderStatic();
       if (statusReadout) statusReadout.textContent = 'quiet';
       return;
     }
@@ -382,6 +401,7 @@ const initialiseField = (root: HTMLElement) => {
 
   if (motionQuery.matches) {
     if (statusReadout) statusReadout.textContent = 'quiet';
+    renderStatic();
   } else {
     start();
   }

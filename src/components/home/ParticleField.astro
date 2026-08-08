@@ -40,6 +40,27 @@
     pointer-events: none;
   }
 
+  .field-stage::before {
+    position: absolute;
+    z-index: 0;
+    inset: 4% -6% 5% -4%;
+    background:
+      radial-gradient(circle at 18% 22%, rgb(77 94 122 / 0.5) 0 1.5px, transparent 2.5px),
+      radial-gradient(circle at 34% 36%, rgb(105 96 132 / 0.42) 0 1.8px, transparent 2.8px),
+      radial-gradient(circle at 48% 19%, rgb(92 119 122 / 0.45) 0 1.4px, transparent 2.5px),
+      radial-gradient(circle at 63% 42%, rgb(77 94 122 / 0.44) 0 1.6px, transparent 2.7px),
+      radial-gradient(circle at 72% 27%, rgb(105 96 132 / 0.48) 0 1.9px, transparent 3px),
+      radial-gradient(circle at 82% 51%, rgb(92 119 122 / 0.42) 0 1.4px, transparent 2.5px),
+      radial-gradient(circle at 26% 61%, rgb(77 94 122 / 0.32) 0 1.2px, transparent 2.3px),
+      radial-gradient(circle at 56% 69%, rgb(105 96 132 / 0.35) 0 1.3px, transparent 2.5px),
+      linear-gradient(28deg, transparent 36%, rgb(82 98 128 / 0.11) 36.2% 36.35%, transparent 36.6%),
+      linear-gradient(154deg, transparent 43%, rgb(82 98 128 / 0.1) 43.2% 43.35%, transparent 43.7%);
+    content: "";
+    mask-image: radial-gradient(ellipse at 58% 46%, black 0 56%, transparent 74%);
+    opacity: 0.16;
+    pointer-events: none;
+  }
+
   .field-canvas {
     position: fixed;
     z-index: 0;
@@ -182,8 +203,8 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .field-canvas {
-      display: none;
+    .field-stage::before {
+      opacity: 0.82;
     }
 
     .field-hud__bars i {
