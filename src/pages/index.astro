@@ -1,48 +1,298 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/home/Hero.astro';
+import SectionHeading from '../components/home/SectionHeading.astro';
+import AboutPreview from '../components/home/AboutPreview.astro';
+import ContactPanel from '../components/home/ContactPanel.astro';
+import NoteCard from '../components/NoteCard.astro';
+import PublicationItem from '../components/PublicationItem.astro';
 import { profile } from '../data/profile';
+import { publications } from '../data/publications';
+
+const notePlaceholders = [
+  {
+    href: '/notes/800v-to-low-voltage/',
+    title: '800 V → Low Voltage: Architecture Before Topology',
+    description: 'A first-principles map of partitioning, isolation, conversion ratio, and where topology selection actually begins.',
+    category: 'Power Conversion',
+    type: 'Deep Dive',
+    date: '2026-08-08',
+    tags: ['Architecture', 'DCX', 'Conversion Ratio'],
+    visual: 'architecture-flow' as const,
+    size: 'wide' as const,
+  },
+  {
+    href: '/notes/read-a-20-layer-pcb-transformer/',
+    title: 'How to Read a 20-Layer PCB Transformer',
+    description: 'Start from MMF distribution, leakage-field location, and electric-field stress—not from a winding recipe.',
+    category: 'Power Magnetics',
+    type: 'Design Note',
+    date: '2026-08-07',
+    tags: ['Planar Transformer', 'PCB Winding'],
+    visual: 'transformer-stack' as const,
+    size: 'narrow' as const,
+  },
+  {
+    href: '/notes/type-iii-compensator-limit/',
+    title: 'Where a Type-III Compensator Stops Helping',
+    description: 'Sampling, computation, and PWM update delay impose a harder bandwidth boundary than compensator algebra suggests.',
+    category: 'Digital Power & Control',
+    type: 'Lab Note',
+    date: '2026-08-06',
+    tags: ['Loop Shaping', 'Digital Delay'],
+    visual: 'control-bandwidth' as const,
+    size: 'narrow' as const,
+  },
+  {
+    href: '/notes/load-insensitive-zvs/',
+    title: 'What Load-Insensitive ZVS Actually Means',
+    description: 'A generalized view of impedance trajectories, charge balance, and why the light-load boundary matters.',
+    category: 'Wireless Power',
+    type: 'Research Note',
+    date: '2026-08-05',
+    tags: ['ZVS', 'Resonance', 'Impedance'],
+    visual: 'zvs-orbit' as const,
+    size: 'wide' as const,
+  },
+];
+
+const selectedPublications = publications.filter((publication) => publication.selected);
 ---
 
 <BaseLayout title={profile.name} description={profile.shortBio} bodyClass="home-page">
-  <section class="page-shell foundation-hero">
-    <div>
-      <p class="eyebrow">Power Electronics · Research & Engineering</p>
-      <h1>Engineering<br />the <span class="serif">invisible</span><br /><span>fields.</span></h1>
-      <p>{profile.shortBio}</p>
-      <a class="button primary" href="/notes/">Explore technical notes <span aria-hidden="true">→</span></a>
+  <Hero />
+  <AboutPreview />
+
+  <section class="section" aria-labelledby="featured-notes-heading">
+    <div class="page-shell">
+      <SectionHeading
+        index="02"
+        label="Featured Notes"
+        title="A technical notebook for"
+        accent="deep work."
+        description="Each note begins with a sharp engineering question, builds a model, and ends with practical implications. These first entries are clearly marked editorial placeholders."
+        headingId="featured-notes-heading"
+      />
+
+      <div class="notes-grid">
+        {notePlaceholders.map((note) => <NoteCard {...note} placeholder />)}
+      </div>
+
+      <div class="section-footer">
+        <span>Deep dives · design notes · lab notes · research notes</span>
+        <a href="/notes/">View the full notebook <i aria-hidden="true"></i></a>
+      </div>
     </div>
   </section>
+
+  <section class="section" aria-labelledby="publications-heading">
+    <div class="page-shell">
+      <SectionHeading
+        index="03"
+        label="Publications"
+        title="Selected work, without the"
+        accent="CV wall."
+        description="Only verified publication records will appear here; titles, venues, and links are never inferred."
+        headingId="publications-heading"
+      />
+
+      <div class="publication-list">
+        {
+          selectedPublications.length > 0 ? (
+            selectedPublications.map((publication) => <PublicationItem {...publication} />)
+          ) : (
+            <div class="publication-empty">
+              <span>RECORD / PENDING</span>
+              <p>Verified publication metadata will be added here.</p>
+              <a href="/publications/">Open publication index <span aria-hidden="true">→</span></a>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section latest-section" aria-labelledby="latest-notes-heading">
+    <div class="page-shell">
+      <SectionHeading
+        index="04"
+        label="Latest Notes"
+        title="Recent signals from the"
+        accent="field log."
+        description="A chronological entry point for new engineering notes and updated working models."
+        headingId="latest-notes-heading"
+      />
+
+      <div class="latest-list">
+        {
+          notePlaceholders.slice(0, 3).map((note, index) => (
+            <a href={note.href}>
+              <code>{String(index + 1).padStart(2, '0')} / {note.date}</code>
+              <div>
+                <span>{note.category} · {note.type}</span>
+                <h3>{note.title}</h3>
+              </div>
+              <span class="latest-arrow" aria-hidden="true">↗</span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <ContactPanel index="05" />
 </BaseLayout>
 
 <style>
-  .foundation-hero {
+  .notes-grid {
     display: grid;
-    min-height: calc(100svh - var(--header-h));
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--grid-gap);
+  }
+
+  .section-footer {
+    display: flex;
+    gap: 24px;
     align-items: center;
-    padding-block: 72px;
+    justify-content: space-between;
+    margin-top: 34px;
+    color: var(--ink-micro);
+    font-size: 12px;
   }
 
-  .foundation-hero > div {
-    max-width: 760px;
+  .section-footer a {
+    display: inline-flex;
+    gap: 9px;
+    align-items: center;
+    color: var(--ink);
+    font-weight: 580;
   }
 
-  h1 {
-    margin: 22px 0 30px;
-    font-size: var(--text-hero);
-    font-weight: 560;
-    letter-spacing: -0.065em;
-    line-height: 0.91;
+  .section-footer i {
+    width: 30px;
+    height: 1px;
+    background: currentColor;
+    transition: width var(--duration-base) ease;
   }
 
-  h1 > span:last-child {
+  .section-footer a:hover i {
+    width: 44px;
+  }
+
+  .publication-list {
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .publication-empty {
+    display: grid;
+    grid-template-columns: 150px 1fr auto;
+    gap: 24px;
+    align-items: center;
+    padding: 34px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .publication-empty > span {
+    color: var(--ink-micro);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+
+  .publication-empty p {
+    margin: 0;
     color: var(--ink-soft);
-    font-weight: 310;
+    font-size: 18px;
   }
 
-  p:not(.eyebrow) {
-    max-width: 610px;
-    margin-bottom: 32px;
-    color: var(--ink-soft);
-    font-size: 19px;
+  .publication-empty a {
+    font-size: 13px;
+    font-weight: 580;
+  }
+
+  .latest-section::after {
+    position: absolute;
+    z-index: -1;
+    top: 18%;
+    right: -12rem;
+    width: 32rem;
+    height: 32rem;
+    border: 1px solid rgb(105 127 156 / 0.09);
+    border-radius: 50%;
+    box-shadow: 0 0 0 42px rgb(113 109 143 / 0.025), 0 0 0 96px rgb(118 152 151 / 0.018);
+    content: "";
+  }
+
+  .latest-list {
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .latest-list > a {
+    display: grid;
+    grid-template-columns: 150px 1fr auto;
+    gap: 24px;
+    align-items: center;
+    padding: 25px 0;
+    border-bottom: 1px solid var(--line);
+    transition: padding-left var(--duration-base) ease;
+  }
+
+  .latest-list > a:hover {
+    padding-left: 12px;
+  }
+
+  .latest-list code,
+  .latest-list div > span {
+    color: var(--ink-micro);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .latest-list h3 {
+    margin: 6px 0 0;
+    font-size: clamp(19px, 2vw, 27px);
+    font-weight: 520;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+  }
+
+  .latest-arrow {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    place-items: center;
+  }
+
+  @media (max-width: 720px) {
+    .section-footer {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .publication-empty,
+    .latest-list > a {
+      grid-template-columns: 1fr auto;
+      gap: 12px 18px;
+    }
+
+    .publication-empty > span,
+    .latest-list code {
+      grid-column: 1 / -1;
+    }
+
+    .publication-empty p,
+    .latest-list div {
+      grid-column: 1;
+    }
+
+    .publication-empty a,
+    .latest-arrow {
+      grid-column: 2;
+      grid-row: 2;
+    }
   }
 </style>

@@ -1,0 +1,262 @@
+---
+import { profile } from '../../data/profile';
+import SectionHeading from './SectionHeading.astro';
+
+const interestDescriptions: Record<string, string> = {
+  'High-Frequency Power Conversion':
+    'Converter architectures / switching behavior / high conversion ratios',
+  'Power Magnetics': 'Planar structures / AC loss / leakage field / field shaping',
+  'Digital Power & Control':
+    'Sampling delay / loop shaping / embedded control / measurement',
+  'Wireless Power': 'Resonance / soft switching / rectification / compensation',
+};
+
+const interests = profile.technicalInterests.slice(0, 4).map((title, index) => ({
+  title,
+  index: String(index + 1).padStart(2, '0'),
+  description:
+    interestDescriptions[title] ?? 'First-principles notes, models, and engineering observations.',
+}));
+---
+
+<section class="section about-preview" id="about" aria-labelledby="about-heading">
+  <div class="page-shell">
+    <SectionHeading
+      index="01"
+      label="About"
+      title="Research with an"
+      accent="engineering pulse."
+      description={profile.shortBio}
+    />
+
+    <div class="about-grid">
+      <div class="about-main reveal">
+        <p class="about-copy">
+          My work sits where <strong>converter architectures</strong>,
+          <span class="serif">electromagnetic fields</span>, switching behavior, and control meet.
+          I care about first-principles models and what remains useful at a real lab bench.
+        </p>
+        <a class="about-link" href="/about/">
+          Continue to About <span aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+
+      <dl class="about-aside reveal">
+        <div class="fact">
+          <dt>Identity</dt>
+          <dd>{profile.headline}</dd>
+        </div>
+        <div class="fact">
+          <dt>Research</dt>
+          <dd>{profile.technicalInterests.join(' / ')}</dd>
+        </div>
+        <div class="fact">
+          <dt>Approach</dt>
+          <dd>First principles / modeling / simulation / measurement</dd>
+        </div>
+        <div class="fact">
+          <dt>Notebook</dt>
+          <dd>Public technical notes and publication index</dd>
+        </div>
+      </dl>
+    </div>
+
+    <div class="interest-strip reveal" aria-label="Technical interests">
+      {
+        interests.map((interest) => (
+          <article class="interest">
+            <small>FIELD / {interest.index}</small>
+            <h3>{interest.title}</h3>
+            <p>{interest.description}</p>
+          </article>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: clamp(32px, 7vw, 96px);
+    align-items: start;
+  }
+
+  .about-main {
+    max-width: 700px;
+  }
+
+  .about-copy {
+    margin: 0;
+    color: #343d4a;
+    font-size: clamp(20px, 2.25vw, 31px);
+    letter-spacing: -0.025em;
+    line-height: 1.45;
+  }
+
+  .about-copy strong {
+    color: var(--ink);
+    font-weight: 570;
+  }
+
+  .about-copy .serif {
+    color: var(--violet);
+    font-family: var(--font-serif);
+    font-style: italic;
+  }
+
+  .about-link {
+    display: inline-flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 30px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--line-strong);
+    color: var(--ink-soft);
+    font-size: 12px;
+    font-weight: 620;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition:
+      gap var(--duration-base) ease,
+      color var(--duration-base) ease,
+      border-color var(--duration-base) ease;
+  }
+
+  .about-link:hover {
+    gap: 15px;
+    border-color: var(--ink-soft);
+    color: var(--ink);
+  }
+
+  .about-aside {
+    display: grid;
+    margin: 0;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .fact {
+    display: grid;
+    grid-template-columns: 110px minmax(0, 1fr);
+    gap: 16px;
+    padding: 17px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 13px;
+  }
+
+  .fact dt {
+    margin: 0;
+    color: var(--ink-micro);
+    font-size: 10px;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+
+  .fact dd {
+    margin: 0;
+    color: var(--ink-soft);
+  }
+
+  .interest-strip {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    margin-top: clamp(60px, 9vw, 100px);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--line);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .interest {
+    position: relative;
+    min-height: 190px;
+    padding: 24px;
+    overflow: hidden;
+    background: var(--surface);
+    backdrop-filter: blur(12px);
+  }
+
+  .interest::after {
+    position: absolute;
+    right: -60px;
+    bottom: -70px;
+    width: 140px;
+    height: 140px;
+    border: 1px solid rgb(92 105 133 / 0.15);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 13px rgb(92 105 133 / 0.035),
+      0 0 0 27px rgb(92 105 133 / 0.025);
+    content: "";
+    transition: transform 500ms var(--ease-out);
+  }
+
+  .interest:hover::after {
+    transform: scale(1.16) translate(-8px, -8px);
+  }
+
+  .interest small {
+    position: relative;
+    z-index: 1;
+    display: block;
+    margin-bottom: 32px;
+    color: var(--ink-micro);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+
+  .interest h3 {
+    position: relative;
+    z-index: 1;
+    max-width: 190px;
+    margin: 0 0 10px;
+    font-size: 20px;
+    font-weight: 580;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+  }
+
+  .interest p {
+    position: relative;
+    z-index: 1;
+    max-width: 205px;
+    margin: 0;
+    color: var(--ink-micro);
+    font-size: 12px;
+    line-height: 1.55;
+  }
+
+  @media (max-width: 980px) {
+    .interest-strip {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 720px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .about-aside {
+      margin-top: 8px;
+    }
+
+    .interest-strip {
+      grid-template-columns: 1fr;
+    }
+
+    .interest {
+      min-height: 150px;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .fact {
+      grid-template-columns: 86px minmax(0, 1fr);
+    }
+  }
+</style>

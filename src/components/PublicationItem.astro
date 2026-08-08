@@ -1,0 +1,173 @@
+---
+import Tag from './Tag.astro';
+
+interface Props {
+  year: number | string;
+  title: string;
+  authors?: string | string[];
+  venue?: string;
+  note?: string;
+  doi?: string;
+  pdf?: string;
+  bibtex?: string;
+  code?: string;
+}
+
+const {
+  year,
+  title,
+  authors,
+  venue,
+  note,
+  doi,
+  pdf,
+  bibtex,
+  code,
+} = Astro.props;
+
+const authorsText = Array.isArray(authors) ? authors.join(', ') : authors;
+
+const usableHref = (value?: string) => {
+  const href = value?.trim();
+  if (!href || href === '#' || href.toLowerCase().startsWith('javascript:')) return null;
+  return href;
+};
+
+const doiHref = (() => {
+  const value = usableHref(doi);
+  if (!value) return null;
+  const normalized = value.replace(/^doi:\s*/i, '');
+  return normalized.startsWith('10.') ? `https://doi.org/${normalized}` : normalized;
+})();
+
+const links = [
+  { label: 'DOI', href: doiHref },
+  { label: 'PDF', href: usableHref(pdf) },
+  { label: 'BibTeX', href: usableHref(bibtex) },
+  { label: 'Code', href: usableHref(code) },
+].filter((link) => link.href !== null) as Array<{ label: string; href: string }>;
+---
+
+<article class:list={['publication-item', { 'has-links': links.length > 0 }]}>
+  <div class="publication-year">{year}</div>
+
+  <div class="publication-copy">
+    <h3>{title}</h3>
+    {authorsText && <p class="authors">{authorsText}</p>}
+    {
+      (venue || note) && (
+        <p class="details">
+          {venue && <span>{venue}</span>}
+          {venue && note && <span class="separator" aria-hidden="true">·</span>}
+          {note && <span>{note}</span>}
+        </p>
+      )
+    }
+  </div>
+
+  {
+    links.length > 0 && (
+      <div class="publication-links" aria-label={`Links for ${title}`}>
+        {links.map((link) => <Tag label={link.label} href={link.href} />)}
+      </div>
+    )
+  }
+</article>
+
+<style>
+  .publication-item {
+    display: grid;
+    grid-template-columns: 95px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+    margin-top: -1px;
+    padding: 28px 0;
+    border-block: 1px solid var(--line);
+    transition:
+      padding-left var(--duration-base) ease,
+      background var(--duration-base) ease;
+  }
+
+  .publication-item.has-links {
+    grid-template-columns: 95px minmax(0, 1fr) auto;
+  }
+
+  .publication-item:hover {
+    padding-left: 12px;
+  }
+
+  .publication-year {
+    padding-top: 4px;
+    color: var(--ink-faint);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: clamp(20px, 2.15vw, 29px);
+    font-weight: 520;
+    letter-spacing: -0.025em;
+    line-height: 1.25;
+    text-wrap: balance;
+  }
+
+  .authors,
+  .details {
+    margin: 8px 0 0;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  .authors {
+    color: var(--ink);
+  }
+
+  .details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .separator {
+    color: var(--ink-faint);
+  }
+
+  .publication-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    justify-content: flex-end;
+    padding-top: 2px;
+  }
+
+  @media (max-width: 720px) {
+    .publication-item,
+    .publication-item.has-links {
+      grid-template-columns: 68px minmax(0, 1fr);
+      gap: 16px;
+    }
+
+    .publication-links {
+      grid-column: 2;
+      justify-content: flex-start;
+      padding-top: 0;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .publication-item:hover {
+      padding-left: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .publication-item {
+      transition: none;
+    }
+
+    .publication-item:hover {
+      padding-left: 0;
+    }
+  }
+</style>

@@ -1,0 +1,302 @@
+---
+type DiagramVisual =
+  | 'architecture-flow'
+  | 'transformer-stack'
+  | 'control-bandwidth'
+  | 'zvs-orbit';
+
+interface Props {
+  visual: DiagramVisual;
+}
+
+const { visual } = Astro.props;
+---
+
+{
+  visual === 'architecture-flow' && (
+    <svg class="technical-diagram" viewBox="0 0 720 220" fill="none" aria-hidden="true" focusable="false">
+      <path class="guide" d="M76 110H644" />
+      <path class="trace" d="M103 110C186 29 261 190 350 110C438 30 514 189 616 110" />
+
+      <rect class="module module-blue" x="76" y="75" width="84" height="70" rx="12" />
+      <rect class="module module-violet" x="318" y="62" width="96" height="96" rx="16" />
+      <rect class="module module-teal" x="574" y="82" width="70" height="56" rx="12" />
+
+      <text class="label" x="118" y="106" text-anchor="middle">800 V</text>
+      <text class="micro" x="118" y="124" text-anchor="middle">BUS</text>
+      <text class="label" x="366" y="104" text-anchor="middle">DCX</text>
+      <text class="micro" x="366" y="122" text-anchor="middle">FIELD LINK</text>
+      <text class="label" x="609" y="107" text-anchor="middle">6 V</text>
+      <text class="micro" x="609" y="124" text-anchor="middle">LOAD</text>
+
+      <circle class="signal-dot violet-dot" cx="243" cy="110" r="4" />
+      <circle class="orbit orbit-violet" cx="366" cy="110" r="46" />
+      <circle class="orbit orbit-faint" cx="366" cy="110" r="58" />
+      <ellipse class="orbit orbit-violet" cx="366" cy="110" rx="82" ry="25" transform="rotate(-18 366 110)" />
+      <circle class="core violet-core" cx="366" cy="110" r="10" />
+    </svg>
+  )
+}
+
+{
+  visual === 'transformer-stack' && (
+    <svg class="technical-diagram" viewBox="0 0 520 220" fill="none" aria-hidden="true" focusable="false">
+      <g transform="translate(64 34)">
+        <path class="layer layer-blue" d="M18 20H344L378 38H52L18 20Z" />
+        <path class="layer layer-violet" d="M18 49H344L378 67H52L18 49Z" />
+        <path class="layer layer-teal" d="M18 78H344L378 96H52L18 78Z" />
+        <path class="layer layer-violet" d="M18 107H344L378 125H52L18 107Z" />
+        <path class="layer layer-blue" d="M18 136H344L378 154H52L18 136Z" />
+        <path class="trace stack-trace" d="M65 31H324M65 60H324M65 89H324M65 118H324M65 147H324" />
+        <path class="center-line" d="M198 12V164" />
+        <circle class="signal-dot teal-dot" cx="198" cy="89" r="4" />
+      </g>
+      <text class="micro tracked" x="28" y="199">MMF / LEAKAGE / ELECTRIC FIELD</text>
+    </svg>
+  )
+}
+
+{
+  visual === 'control-bandwidth' && (
+    <svg class="technical-diagram" viewBox="0 0 520 220" fill="none" aria-hidden="true" focusable="false">
+      <path class="axis" d="M48 176H470M48 29V176" />
+      <path class="grid" d="M48 72H470M48 122H470M148 29V176M260 29V176M372 29V176" />
+      <path class="response response-blue" d="M52 65C128 62 173 68 224 86C278 105 336 124 467 153" />
+      <path class="trace response-violet" d="M52 105C127 104 184 96 235 76C284 58 340 56 467 74" />
+      <path class="delay-line" d="M275 36V176" />
+      <circle class="signal-dot teal-dot" cx="275" cy="101" r="4" />
+      <text class="micro" x="278" y="28">DELAY LIMIT</text>
+      <text class="micro tracked" x="54" y="198">FREQUENCY →</text>
+    </svg>
+  )
+}
+
+{
+  visual === 'zvs-orbit' && (
+    <svg class="technical-diagram" viewBox="0 0 720 220" fill="none" aria-hidden="true" focusable="false">
+      <circle class="field-halo" cx="360" cy="110" r="76" />
+      <circle class="orbit orbit-blue" cx="360" cy="110" r="62" />
+      <circle class="orbit orbit-violet" cx="360" cy="110" r="45" />
+      <ellipse class="orbit orbit-teal" cx="360" cy="110" rx="174" ry="53" transform="rotate(7 360 110)" />
+      <ellipse class="trace orbit orbit-blue-strong" cx="360" cy="110" rx="174" ry="53" transform="rotate(-18 360 110)" />
+      <ellipse class="orbit orbit-violet" cx="360" cy="110" rx="125" ry="37" transform="rotate(52 360 110)" />
+      <path class="guide" d="M106 110H245M476 110H614" />
+      <path class="wave" d="M113 92C131 92 131 128 149 128C167 128 167 92 185 92C203 92 203 128 221 128" />
+      <path class="wave" d="M499 92C517 92 517 128 535 128C553 128 553 92 571 92C589 92 589 128 607 128" />
+      <circle class="signal-dot teal-dot" cx="360" cy="110" r="5" />
+      <text class="label" x="360" y="114" text-anchor="middle">ZVS</text>
+    </svg>
+  )
+}
+
+<style>
+  .technical-diagram {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  :where(path, rect, circle, ellipse) {
+    vector-effect: non-scaling-stroke;
+  }
+
+  .guide,
+  .axis {
+    stroke: var(--blue);
+    stroke-opacity: 0.24;
+  }
+
+  .grid {
+    stroke: var(--blue);
+    stroke-opacity: 0.08;
+  }
+
+  .module,
+  .layer {
+    fill: var(--paper-3);
+    fill-opacity: 0.66;
+    stroke-width: 1;
+  }
+
+  .module-blue,
+  .layer-blue {
+    stroke: var(--blue);
+    stroke-opacity: 0.42;
+  }
+
+  .module-violet,
+  .layer-violet {
+    stroke: var(--violet);
+    stroke-opacity: 0.44;
+  }
+
+  .module-teal,
+  .layer-teal {
+    stroke: var(--teal);
+    stroke-opacity: 0.44;
+  }
+
+  .layer-blue {
+    fill: var(--blue);
+    fill-opacity: 0.14;
+  }
+
+  .layer-violet {
+    fill: var(--violet);
+    fill-opacity: 0.12;
+  }
+
+  .layer-teal {
+    fill: var(--teal);
+    fill-opacity: 0.12;
+  }
+
+  .trace {
+    stroke: var(--violet);
+    stroke-width: 1.6;
+    stroke-dasharray: 8 11;
+    stroke-opacity: 0.72;
+    animation: field-trace 12s linear infinite;
+  }
+
+  .stack-trace {
+    stroke: var(--blue);
+    stroke-width: 1.4;
+    stroke-opacity: 0.48;
+  }
+
+  .center-line {
+    stroke: var(--violet);
+    stroke-dasharray: 3 7;
+    stroke-opacity: 0.24;
+  }
+
+  .response {
+    stroke-width: 1.7;
+  }
+
+  .response-blue {
+    stroke: var(--blue);
+    stroke-opacity: 0.88;
+  }
+
+  .response-violet {
+    stroke: var(--violet);
+    stroke-opacity: 0.76;
+  }
+
+  .delay-line {
+    stroke: var(--teal);
+    stroke-dasharray: 5 7;
+    stroke-opacity: 0.52;
+  }
+
+  .orbit {
+    stroke-width: 1;
+  }
+
+  .orbit-blue {
+    stroke: var(--blue);
+    stroke-opacity: 0.3;
+  }
+
+  .orbit-blue-strong {
+    stroke: var(--blue);
+    stroke-opacity: 0.65;
+  }
+
+  .orbit-violet {
+    stroke: var(--violet);
+    stroke-opacity: 0.24;
+  }
+
+  .orbit-teal {
+    stroke: var(--teal);
+    stroke-opacity: 0.36;
+  }
+
+  .orbit-faint {
+    stroke: var(--violet);
+    stroke-opacity: 0.09;
+  }
+
+  .field-halo {
+    fill: var(--teal);
+    fill-opacity: 0.11;
+  }
+
+  .core {
+    stroke: none;
+  }
+
+  .violet-core {
+    fill: var(--violet);
+    fill-opacity: 0.13;
+  }
+
+  .wave {
+    stroke: var(--blue);
+    stroke-width: 1.2;
+    stroke-opacity: 0.66;
+  }
+
+  .signal-dot {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: signal 3.3s ease-in-out infinite;
+  }
+
+  .violet-dot {
+    fill: var(--violet);
+  }
+
+  .teal-dot {
+    fill: var(--teal);
+  }
+
+  .label,
+  .micro {
+    font-family: var(--font-mono);
+  }
+
+  .label {
+    fill: var(--ink);
+    font-size: 13px;
+  }
+
+  .micro {
+    fill: var(--ink-faint);
+    font-size: 9px;
+  }
+
+  .tracked {
+    letter-spacing: 1.5px;
+  }
+
+  @keyframes field-trace {
+    to {
+      stroke-dashoffset: -220;
+    }
+  }
+
+  @keyframes signal {
+    0%,
+    100% {
+      transform: scale(0.85);
+      opacity: 0.24;
+    }
+
+    50% {
+      transform: scale(1.25);
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .trace,
+    .signal-dot {
+      animation: none;
+    }
+  }
+</style>

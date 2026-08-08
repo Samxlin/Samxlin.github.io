@@ -1,0 +1,268 @@
+---
+import { profileLinks } from '../../data/profile';
+
+interface Props {
+  index?: string;
+}
+
+const { index = '05' } = Astro.props;
+const isExternal = (href: string) => /^https?:\/\//.test(href);
+---
+
+<section class="section contact-section" id="contact" aria-labelledby="contact-heading">
+  <div class="page-shell">
+    <div class="contact-card reveal">
+      <span class="field-orbit" aria-hidden="true"><i></i></span>
+
+      <div class="contact-copy">
+        <p class="contact-eyebrow">{index} <span aria-hidden="true">&middot;</span> Contact</p>
+        <h2 id="contact-heading">Let the next idea find a <em>resonant path.</em></h2>
+        <p>
+          For technical discussion, research collaboration, and thoughtful engineering
+          conversations. Company-confidential implementation details remain outside this public
+          notebook.
+        </p>
+      </div>
+
+      <div class="contact-links" aria-label="Contact channels">
+        {
+          profileLinks.map((link) =>
+            link.href ? (
+              <a
+                class="contact-row"
+                href={link.href}
+                target={isExternal(link.href) ? '_blank' : undefined}
+                rel={isExternal(link.href) ? 'me noopener noreferrer' : undefined}
+              >
+                <span>{link.label}</span>
+                <span class="row-value">
+                  {link.value} <span aria-hidden="true">&nearr;</span>
+                </span>
+              </a>
+            ) : (
+              <div class="contact-row is-pending">
+                <span>{link.label}</span>
+                <span class="row-value">
+                  {link.value}
+                  <small>Pending</small>
+                </span>
+              </div>
+            ),
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.18fr 0.82fr;
+    gap: 60px;
+    align-items: end;
+    min-height: 430px;
+    padding: clamp(35px, 6vw, 74px);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-contact);
+    background:
+      radial-gradient(circle at 84% 18%, rgb(121 137 165 / 0.18), transparent 26rem),
+      linear-gradient(135deg, rgb(249 250 247 / 0.8), rgb(228 234 232 / 0.62));
+    box-shadow: 0 30px 100px rgb(45 59 79 / 0.08);
+  }
+
+  .contact-card::before {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgb(55 71 91 / 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(55 71 91 / 0.045) 1px, transparent 1px);
+    background-size: 30px 30px;
+    content: "";
+    mask-image: radial-gradient(circle at 75% 30%, black, transparent 66%);
+    pointer-events: none;
+  }
+
+  .field-orbit {
+    position: absolute;
+    top: -118px;
+    right: -52px;
+    width: 330px;
+    height: 330px;
+    border: 1px solid rgb(91 105 135 / 0.12);
+    border-radius: 50%;
+    box-shadow:
+      0 0 0 34px rgb(91 105 135 / 0.025),
+      0 0 0 78px rgb(91 105 135 / 0.018);
+    pointer-events: none;
+  }
+
+  .field-orbit::before,
+  .field-orbit::after {
+    position: absolute;
+    inset: 50% auto auto 50%;
+    content: "";
+  }
+
+  .field-orbit::before {
+    width: 118%;
+    height: 1px;
+    transform: translate(-50%, -50%) rotate(-31deg);
+    background: linear-gradient(90deg, transparent, rgb(93 107 136 / 0.16), transparent);
+  }
+
+  .field-orbit::after {
+    width: 7px;
+    height: 7px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--blue);
+    box-shadow: 0 0 18px rgb(105 127 156 / 0.42);
+  }
+
+  .field-orbit i {
+    position: absolute;
+    inset: 23%;
+    transform: rotate(32deg) scaleY(0.42);
+    border: 1px solid rgb(91 105 135 / 0.16);
+    border-radius: 50%;
+  }
+
+  .contact-copy,
+  .contact-links {
+    position: relative;
+    z-index: 1;
+  }
+
+  .contact-eyebrow {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+    margin: 0 0 24px;
+    color: var(--ink-micro);
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+  }
+
+  .contact-copy h2 {
+    max-width: 700px;
+    margin: 0 0 20px;
+    font-size: clamp(42px, 6vw, 78px);
+    font-weight: 470;
+    letter-spacing: -0.055em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  .contact-copy h2 em {
+    color: var(--violet);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .contact-copy > p:last-child {
+    max-width: 620px;
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+
+  .contact-links {
+    display: grid;
+    align-content: end;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .contact-row {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  a.contact-row {
+    transition:
+      padding-left var(--duration-base) ease,
+      color var(--duration-base) ease;
+  }
+
+  a.contact-row:hover {
+    padding-left: 8px;
+    color: var(--ink);
+  }
+
+  .row-value {
+    display: inline-flex;
+    gap: 7px;
+    align-items: center;
+    justify-content: flex-end;
+    min-width: 0;
+    color: var(--ink-micro);
+    text-align: right;
+  }
+
+  .is-pending {
+    cursor: default;
+  }
+
+  .is-pending .row-value {
+    color: var(--ink-faint);
+  }
+
+  .row-value small {
+    display: inline-flex;
+    align-items: center;
+    min-height: 20px;
+    padding-inline: 7px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    color: var(--ink-micro);
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 980px) {
+    .contact-card {
+      grid-template-columns: 1fr;
+      gap: 50px;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .contact-card {
+      min-height: 0;
+      gap: 42px;
+      padding: 30px 24px;
+      border-radius: 24px;
+    }
+
+    .field-orbit {
+      top: -155px;
+      right: -145px;
+    }
+  }
+
+  @media (max-width: 430px) {
+    .contact-row {
+      gap: 10px;
+      align-items: flex-start;
+    }
+
+    .row-value {
+      flex-wrap: wrap;
+      max-width: 65%;
+    }
+  }
+</style>

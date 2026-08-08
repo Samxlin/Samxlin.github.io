@@ -1,3 +1,5 @@
+export {};
+
 const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
 const header = document.querySelector<HTMLElement>('[data-site-header]');
 const progress = document.querySelector<HTMLElement>('[data-scroll-progress]');

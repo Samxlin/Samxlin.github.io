@@ -1,0 +1,95 @@
+---
+interface Props {
+  index: string;
+  label: string;
+  title: string;
+  accent?: string;
+  description?: string;
+  headingId?: string;
+}
+
+const { index, label, title, accent, description, headingId: suppliedHeadingId } = Astro.props;
+const headingId = suppliedHeadingId ?? `${label.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}-heading`;
+---
+
+<div class="section-heading reveal">
+  <div class="heading-index">
+    <span>{index}</span>
+    <span aria-hidden="true">&middot;</span>
+    <span>{label}</span>
+  </div>
+  <div class="heading-copy">
+    <h2 id={headingId}>
+      {title}{accent && <> <em>{accent}</em></>}
+    </h2>
+    {description && <p>{description}</p>}
+  </div>
+</div>
+
+<style>
+  .section-heading {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: clamp(28px, 5vw, 74px);
+    align-items: start;
+    margin-bottom: clamp(48px, 7vw, 88px);
+  }
+
+  .heading-index {
+    display: flex;
+    gap: 7px;
+    align-items: center;
+    padding-top: 11px;
+    color: var(--ink-micro);
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: 0.17em;
+    text-transform: uppercase;
+  }
+
+  .heading-index::after {
+    width: 36px;
+    height: 1px;
+    margin-left: 3px;
+    background: var(--line-strong);
+    content: "";
+  }
+
+  h2 {
+    margin: 0;
+    font-size: var(--text-section);
+    font-weight: 480;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    text-wrap: balance;
+  }
+
+  h2 em {
+    color: var(--violet);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  p {
+    max-width: 670px;
+    margin: 20px 0 0;
+    color: var(--ink-soft);
+    font-size: 17px;
+  }
+
+  @media (max-width: 720px) {
+    .section-heading {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .heading-index {
+      padding-top: 0;
+    }
+
+    p {
+      font-size: 16px;
+    }
+  }
+</style>
