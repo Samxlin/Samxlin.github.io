@@ -6,55 +6,29 @@ import AboutPreview from '../components/home/AboutPreview.astro';
 import ContactPanel from '../components/home/ContactPanel.astro';
 import NoteCard from '../components/NoteCard.astro';
 import PublicationItem from '../components/PublicationItem.astro';
+import { getCollection } from 'astro:content';
 import { profile } from '../data/profile';
 import { publications } from '../data/publications';
 
-const notePlaceholders = [
-  {
-    href: '/notes/800v-to-low-voltage/',
-    title: '800 V → Low Voltage: Architecture Before Topology',
-    description: 'A first-principles map of partitioning, isolation, conversion ratio, and where topology selection actually begins.',
-    category: 'Power Conversion',
-    type: 'Deep Dive',
-    date: '2026-08-08',
-    tags: ['Architecture', 'DCX', 'Conversion Ratio'],
-    visual: 'architecture-flow' as const,
-    size: 'wide' as const,
-  },
-  {
-    href: '/notes/read-a-20-layer-pcb-transformer/',
-    title: 'How to Read a 20-Layer PCB Transformer',
-    description: 'Start from MMF distribution, leakage-field location, and electric-field stress—not from a winding recipe.',
-    category: 'Power Magnetics',
-    type: 'Design Note',
-    date: '2026-08-07',
-    tags: ['Planar Transformer', 'PCB Winding'],
-    visual: 'transformer-stack' as const,
-    size: 'narrow' as const,
-  },
-  {
-    href: '/notes/type-iii-compensator-limit/',
-    title: 'Where a Type-III Compensator Stops Helping',
-    description: 'Sampling, computation, and PWM update delay impose a harder bandwidth boundary than compensator algebra suggests.',
-    category: 'Digital Power & Control',
-    type: 'Lab Note',
-    date: '2026-08-06',
-    tags: ['Loop Shaping', 'Digital Delay'],
-    visual: 'control-bandwidth' as const,
-    size: 'narrow' as const,
-  },
-  {
-    href: '/notes/load-insensitive-zvs/',
-    title: 'What Load-Insensitive ZVS Actually Means',
-    description: 'A generalized view of impedance trajectories, charge balance, and why the light-load boundary matters.',
-    category: 'Wireless Power',
-    type: 'Research Note',
-    date: '2026-08-05',
-    tags: ['ZVS', 'Resonance', 'Impedance'],
-    visual: 'zvs-orbit' as const,
-    size: 'wide' as const,
-  },
-];
+const slugFromId = (id: string) =>
+  id
+    .replace(/\.(md|mdx)$/i, '')
+    .replace(/(^|\/)index$/i, '')
+    .replace(/^\/+|\/+$/g, '');
+const hrefFor = (id: string) => `/notes/${slugFromId(id)}/`;
+const publishedNotes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf() || a.id.localeCompare(b.id),
+);
+const featuredNotes = publishedNotes
+  .filter(({ data }) => data.featured)
+  .sort(
+    (a, b) =>
+      (a.data.featuredOrder ?? Number.MAX_SAFE_INTEGER) -
+        (b.data.featuredOrder ?? Number.MAX_SAFE_INTEGER) ||
+      b.data.date.valueOf() - a.data.date.valueOf(),
+  )
+  .slice(0, 4);
+const latestNotes = publishedNotes.slice(0, 3);
 
 const selectedPublications = publications.filter((publication) => publication.selected);
 ---
@@ -75,7 +49,22 @@ const selectedPublications = publications.filter((publication) => publication.se
       />
 
       <div class="notes-grid">
-        {notePlaceholders.map((note) => <NoteCard {...note} placeholder />)}
+        {
+          featuredNotes.map(({ id, data }) => (
+            <NoteCard
+              href={hrefFor(id)}
+              title={data.title}
+              description={data.description}
+              category={data.category}
+              type={data.type}
+              date={data.date}
+              tags={data.tags}
+              visual={data.visual}
+              size={data.featureSize}
+              placeholder={data.placeholder}
+            />
+          ))
+        }
       </div>
 
       <div class="section-footer">
@@ -125,12 +114,12 @@ const selectedPublications = publications.filter((publication) => publication.se
 
       <div class="latest-list">
         {
-          notePlaceholders.slice(0, 3).map((note, index) => (
-            <a href={note.href}>
-              <code>{String(index + 1).padStart(2, '0')} / {note.date}</code>
+          latestNotes.map(({ id, data }, index) => (
+            <a href={hrefFor(id)}>
+              <code>{String(index + 1).padStart(2, '0')} / {data.date.toISOString().slice(0, 10)}</code>
               <div>
-                <span>{note.category} · {note.type}</span>
-                <h3>{note.title}</h3>
+                <span>{data.category} · {data.type}</span>
+                <h3>{data.title}</h3>
               </div>
               <span class="latest-arrow" aria-hidden="true">↗</span>
             </a>
@@ -221,6 +210,10 @@ const selectedPublications = publications.filter((publication) => publication.se
     border-radius: 50%;
     box-shadow: 0 0 0 42px rgb(113 109 143 / 0.025), 0 0 0 96px rgb(118 152 151 / 0.018);
     content: "";
+  }
+
+  .latest-section {
+    overflow: clip;
   }
 
   .latest-list {

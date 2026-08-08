@@ -1,0 +1,86 @@
+---
+title: "800 V → Low Voltage: Architecture Before Topology"
+description: "A first-principles map of partitioning, isolation, conversion ratio, and where topology selection actually begins."
+date: 2026-08-08
+category: "Power Conversion"
+tags:
+  - Architecture
+  - DCX
+  - Conversion Ratio
+  - First Principles
+type: "Deep Dive"
+featured: true
+draft: false
+authors: []
+references: []
+visual: "architecture-flow"
+featureSize: "wide"
+featuredOrder: 1
+placeholder: true
+---
+
+import TechnicalFigure from '../../components/TechnicalFigure.astro';
+
+This editorial placeholder demonstrates how a long-form engineering note will read. The symbols, diagrams, and code below are generalized examples—not experimental results or a claim about a particular product.
+
+## Begin with the boundary conditions
+
+Topology names become useful only after the conversion problem has been partitioned. A first pass records the source domain, load domain, isolation boundary, allowed energy storage, control bandwidth, and the operating region over which the architecture must remain valid.
+
+The ideal conversion ratio can be named compactly as $M = V_{\mathrm{out}} / V_{\mathrm{in}}$. That ratio is not a design answer; it is one constraint among several. A symbolic power balance is a useful check before losses or margin are introduced:
+
+$$
+P_{\mathrm{in}} = V_{\mathrm{in}} I_{\mathrm{in}}
+\qquad\text{and}\qquad
+P_{\mathrm{out}} = V_{\mathrm{out}} I_{\mathrm{out}}.
+$$
+
+<TechnicalFigure
+  kind="architecture"
+  label="FIG. 01"
+  caption="A conceptual conversion chain. The center field marks an architectural boundary, not a product schematic."
+  ariaLabel="Conceptual source, field boundary, and load modules connected by an oscillating signal path"
+/>
+
+> Architecture is the set of boundaries and responsibilities. Topology is one implementation inside those boundaries.
+
+## Keep the first model inspectable
+
+A small typed model can make missing assumptions visible without pretending to size real hardware:
+
+```ts
+interface ConversionBoundary {
+  inputVoltage: number;
+  outputVoltage: number;
+  requiresIsolation: boolean;
+}
+
+export function idealRatio(boundary: ConversionBoundary): number {
+  if (boundary.inputVoltage === 0) throw new Error('Input voltage must be non-zero');
+  return boundary.outputVoltage / boundary.inputVoltage;
+}
+```
+
+The initial architecture review can then separate questions that are often collapsed into a single topology discussion:
+
+| Question | Architectural concern | Later implementation concern |
+| --- | --- | --- |
+| Where is isolation required? | Boundary placement | Transformer and insulation system |
+| Where is energy buffered? | Domain responsibility | Capacitor, inductor, or resonant tank |
+| How is regulation divided? | Control ownership | Modulation and compensator design |
+| Which faults cross a boundary? | Protection partition | Sensing and interruption method |
+
+### A useful ordering
+
+1. State the input and output domains.
+2. Draw isolation and protection boundaries.
+3. Allocate regulation and energy storage.
+4. Compare topology families against that architecture.
+
+This ordering keeps a familiar circuit from silently defining the problem it was meant to solve.[^scope]
+
+## What the finished note will add
+
+The production article can replace this scaffold with verified assumptions, cited public-domain sources, loss models, and sensitivity studies. Until then, the page remains visibly marked as a placeholder.
+
+[^scope]: This is a generalized editorial example. It contains no internal specifications, customer data, or company test results.

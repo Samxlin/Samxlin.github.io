@@ -1,0 +1,266 @@
+---
+type FigureKind = 'architecture' | 'transformer' | 'control' | 'resonance';
+
+interface Props {
+  kind: FigureKind;
+  label: string;
+  caption: string;
+  ariaLabel?: string;
+}
+
+const { kind, label, caption, ariaLabel = caption } = Astro.props;
+---
+
+<figure class="technical-figure">
+  <div class="technical-figure__field">
+    {
+      kind === 'architecture' && (
+        <svg viewBox="0 0 760 300" role="img" aria-label={ariaLabel}>
+          <defs>
+            <linearGradient id="architecture-trace" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0" stop-color="var(--blue)" />
+              <stop offset="0.52" stop-color="var(--violet)" />
+              <stop offset="1" stop-color="var(--teal)" />
+            </linearGradient>
+          </defs>
+          <path class="grid-line" d="M60 150H700M380 46V254" />
+          <path class="signal" d="M128 150C206 71 283 229 380 150C474 74 550 226 634 150" />
+          <g class="module">
+            <rect x="72" y="102" width="112" height="96" rx="18" />
+            <text x="128" y="146">SOURCE</text>
+            <text class="micro" x="128" y="167">DOMAIN</text>
+          </g>
+          <g class="module module-core">
+            <rect x="318" y="86" width="124" height="128" rx="24" />
+            <text x="380" y="146">FIELD</text>
+            <text class="micro" x="380" y="167">BOUNDARY</text>
+          </g>
+          <g class="module">
+            <rect x="576" y="110" width="116" height="80" rx="18" />
+            <text x="634" y="146">LOAD</text>
+            <text class="micro" x="634" y="167">DOMAIN</text>
+          </g>
+          <circle class="marker" cx="264" cy="150" r="5" />
+          <circle class="orbit" cx="380" cy="150" r="78" />
+        </svg>
+      )
+    }
+
+    {
+      kind === 'transformer' && (
+        <svg viewBox="0 0 760 300" role="img" aria-label={ariaLabel}>
+          <g class="stack" transform="translate(138 54)">
+            <path d="M0 25H410L476 58H66Z" />
+            <path d="M0 66H410L476 99H66Z" />
+            <path d="M0 107H410L476 140H66Z" />
+            <path d="M0 148H410L476 181H66Z" />
+          </g>
+          <path class="flux" d="M380 48C473 48 527 90 527 150S473 252 380 252S233 210 233 150S287 48 380 48Z" />
+          <path class="axis-line" d="M380 35V266" />
+          <text class="diagram-label" x="72" y="274">LAYERED FIELD VIEW</text>
+        </svg>
+      )
+    }
+
+    {
+      kind === 'control' && (
+        <svg viewBox="0 0 760 300" role="img" aria-label={ariaLabel}>
+          <path class="axis-line" d="M84 44V240H690" />
+          <path class="grid-line" d="M84 104H690M84 168H690M240 44V240M397 44V240M554 44V240" />
+          <path class="control-a" d="M88 93C206 86 272 104 356 141C442 178 533 190 685 218" />
+          <path class="control-b" d="M88 174C190 172 262 151 334 111C421 64 506 72 685 98" />
+          <path class="limit" d="M462 48V240" />
+          <circle class="marker" cx="462" cy="154" r="5" />
+          <text class="diagram-label" x="475" y="67">DELAY BOUNDARY</text>
+          <text class="diagram-label" x="88" y="272">FREQUENCY →</text>
+        </svg>
+      )
+    }
+
+    {
+      kind === 'resonance' && (
+        <svg viewBox="0 0 760 300" role="img" aria-label={ariaLabel}>
+          <circle class="field" cx="380" cy="150" r="74" />
+          <ellipse class="orbit orbit-wide" cx="380" cy="150" rx="242" ry="74" transform="rotate(-12 380 150)" />
+          <ellipse class="orbit" cx="380" cy="150" rx="156" ry="47" transform="rotate(37 380 150)" />
+          <path class="grid-line" d="M76 150H684" />
+          <path class="signal" d="M85 129C105 129 105 171 125 171S145 129 165 129S185 171 205 171M555 129C575 129 575 171 595 171S615 129 635 129S655 171 675 171" />
+          <circle class="marker" cx="380" cy="150" r="6" />
+          <text class="diagram-label diagram-label--center" x="380" y="154">ZVS FIELD</text>
+        </svg>
+      )
+    }
+  </div>
+  <figcaption><span>{label}</span>{caption}</figcaption>
+</figure>
+
+<style>
+  .technical-figure {
+    margin: 42px 0;
+  }
+
+  .technical-figure__field {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background:
+      radial-gradient(circle at 70% 24%, rgb(113 109 143 / 0.14), transparent 34%),
+      linear-gradient(135deg, rgb(255 255 255 / 0.5), rgb(225 231 229 / 0.38));
+  }
+
+  .technical-figure__field::before {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgb(64 78 99 / 0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(64 78 99 / 0.045) 1px, transparent 1px);
+    background-size: 28px 28px;
+    content: '';
+  }
+
+  svg {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  :where(path, rect, circle, ellipse) {
+    vector-effect: non-scaling-stroke;
+  }
+
+  .grid-line,
+  .axis-line {
+    fill: none;
+    stroke: var(--blue);
+    stroke-opacity: 0.13;
+  }
+
+  .signal,
+  .flux,
+  .control-a,
+  .control-b,
+  .limit,
+  .orbit {
+    fill: none;
+    stroke-width: 1.4;
+  }
+
+  .signal {
+    stroke: var(--violet);
+    stroke-dasharray: 8 11;
+  }
+
+  .module rect {
+    fill: rgb(248 249 246 / 0.72);
+    stroke: var(--blue);
+    stroke-opacity: 0.35;
+  }
+
+  .module-core rect {
+    stroke: var(--violet);
+    stroke-opacity: 0.52;
+  }
+
+  text {
+    fill: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    text-anchor: middle;
+  }
+
+  text.micro,
+  .diagram-label {
+    fill: var(--ink-micro);
+    font-size: 9px;
+    letter-spacing: 1.2px;
+  }
+
+  .diagram-label {
+    text-anchor: start;
+  }
+
+  .diagram-label--center {
+    text-anchor: middle;
+  }
+
+  .marker {
+    fill: var(--teal);
+  }
+
+  .orbit {
+    stroke: var(--violet);
+    stroke-opacity: 0.3;
+  }
+
+  .stack path {
+    fill: rgb(105 127 156 / 0.08);
+    stroke: var(--blue);
+    stroke-opacity: 0.34;
+  }
+
+  .stack path:nth-child(even) {
+    fill: rgb(113 109 143 / 0.1);
+    stroke: var(--violet);
+  }
+
+  .flux {
+    stroke: var(--teal);
+    stroke-dasharray: 5 9;
+    stroke-opacity: 0.58;
+  }
+
+  .control-a {
+    stroke: var(--blue);
+    stroke-opacity: 0.86;
+  }
+
+  .control-b {
+    stroke: var(--violet);
+    stroke-opacity: 0.78;
+  }
+
+  .limit {
+    stroke: var(--teal);
+    stroke-dasharray: 5 8;
+    stroke-opacity: 0.6;
+  }
+
+  .field {
+    fill: var(--teal);
+    fill-opacity: 0.1;
+    stroke: var(--teal);
+    stroke-opacity: 0.22;
+  }
+
+  .orbit-wide {
+    stroke: var(--blue);
+    stroke-opacity: 0.52;
+  }
+
+  figcaption {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 14px;
+    margin-top: 13px;
+    color: var(--ink-micro);
+    font-size: 11px;
+    line-height: 1.55;
+  }
+
+  figcaption span {
+    color: var(--violet);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 560px) {
+    figcaption {
+      grid-template-columns: 1fr;
+      gap: 4px;
+    }
+  }
+</style>

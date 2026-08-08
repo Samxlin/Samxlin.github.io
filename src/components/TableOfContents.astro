@@ -1,0 +1,153 @@
+---
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  headings: Heading[];
+}
+
+const { headings } = Astro.props;
+const visibleHeadings = headings.filter(({ depth }) => depth === 2 || depth === 3);
+---
+
+{
+  visibleHeadings.length > 0 && (
+    <div class="toc-shell">
+      <nav class="toc-desktop" aria-label="On this page">
+        <span class="toc-label">On this page</span>
+        <ol>
+          {visibleHeadings.map((heading) => (
+            <li class:list={[`depth-${heading.depth}`]}>
+              <a href={`#${heading.slug}`}>{heading.text}</a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+
+      <details class="toc-mobile">
+        <summary>On this page <span aria-hidden="true">+</span></summary>
+        <nav aria-label="On this page">
+          <ol>
+            {visibleHeadings.map((heading) => (
+              <li class:list={[`depth-${heading.depth}`]}>
+                <a href={`#${heading.slug}`}>{heading.text}</a>
+              </li>
+            ))}
+          </ol>
+        </nav>
+      </details>
+    </div>
+  )
+}
+
+<style>
+  .toc-shell {
+    color: var(--ink-micro);
+  }
+
+  .toc-desktop {
+    position: sticky;
+    top: calc(var(--header-h) + 34px);
+    padding: 18px 0 18px 22px;
+    border-left: 1px solid var(--line-strong);
+  }
+
+  .toc-label {
+    display: block;
+    margin-bottom: 14px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 650;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  ol {
+    display: grid;
+    gap: 9px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  li {
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  li.depth-3 {
+    padding-left: 13px;
+  }
+
+  a {
+    transition: color var(--duration-fast) ease;
+  }
+
+  a:hover {
+    color: var(--ink);
+  }
+
+  .toc-mobile {
+    display: none;
+  }
+
+  @media (max-width: 980px) {
+    .toc-desktop {
+      display: none;
+    }
+
+    .toc-mobile {
+      display: block;
+      margin-bottom: 34px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-hud);
+      background: var(--surface-hud);
+      backdrop-filter: blur(12px);
+    }
+
+    summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      color: var(--ink);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 650;
+      letter-spacing: 0.12em;
+      list-style: none;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary span {
+      font-size: 16px;
+      font-weight: 400;
+      transition: transform var(--duration-fast) ease;
+    }
+
+    details[open] summary span {
+      transform: rotate(45deg);
+    }
+
+    .toc-mobile nav {
+      padding: 0 16px 17px;
+      border-top: 1px solid var(--line);
+    }
+
+    .toc-mobile ol {
+      padding-top: 14px;
+    }
+
+    .toc-mobile li {
+      font-size: 12px;
+    }
+  }
+</style>

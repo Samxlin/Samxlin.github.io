@@ -1,0 +1,56 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import NoteLayout from '../../layouts/NoteLayout.astro';
+
+type NoteEntry = CollectionEntry<'notes'>;
+
+interface Props {
+  note: NoteEntry;
+  previous?: NoteEntry;
+  next?: NoteEntry;
+  related: NoteEntry[];
+}
+
+export async function getStaticPaths() {
+  const slugFromId = (id: string) =>
+    id
+      .replace(/\.(md|mdx)$/i, '')
+      .replace(/(^|\/)index$/i, '')
+      .replace(/^\/+|\/+$/g, '');
+  const relatedScore = (source: NoteEntry, candidate: NoteEntry) => {
+    const sourceTags = new Set(source.data.tags.map((tag) => tag.toLocaleLowerCase('en-US')));
+    const sharedTags = candidate.data.tags.filter((tag) => sourceTags.has(tag.toLocaleLowerCase('en-US'))).length;
+    return sharedTags + (source.data.category === candidate.data.category ? 3 : 0);
+  };
+  const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
+    (a, b) => b.data.date.valueOf() - a.data.date.valueOf() || a.id.localeCompare(b.id),
+  );
+
+  return notes.map((note, index) => {
+    const related = notes
+      .filter((candidate) => candidate.id !== note.id)
+      .map((candidate) => ({ candidate, score: relatedScore(note, candidate) }))
+      .filter(({ score }) => score > 0)
+      .sort((a, b) => b.score - a.score || b.candidate.data.date.valueOf() - a.candidate.data.date.valueOf())
+      .slice(0, 3)
+      .map(({ candidate }) => candidate);
+
+    return {
+      params: { slug: slugFromId(note.id) },
+      props: {
+        note,
+        previous: index > 0 ? notes[index - 1] : undefined,
+        next: index < notes.length - 1 ? notes[index + 1] : undefined,
+        related,
+      },
+    };
+  });
+}
+
+const { note, previous, next, related } = Astro.props;
+const { Content, headings } = await render(note);
+---
+
+<NoteLayout note={note} headings={headings} previous={previous} next={next} related={related}>
+  <Content />
+</NoteLayout>

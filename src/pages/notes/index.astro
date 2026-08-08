@@ -1,16 +1,460 @@
 ---
+import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import NoteCard from '../../components/NoteCard.astro';
+import { noteCategories } from '../../content.config';
+
+const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf() || a.id.localeCompare(b.id),
+);
+
+const slugFromId = (id: string) =>
+  id
+    .replace(/\.(md|mdx)$/i, '')
+    .replace(/(^|\/)index$/i, '')
+    .replace(/^\/+|\/+$/g, '');
+const hrefFor = (id: string) => `/notes/${slugFromId(id)}/`;
+const normalized = (value: string) => value.toLocaleLowerCase('en-US');
+const allTags = [...new Set(notes.flatMap(({ data }) => data.tags))].sort((a, b) => a.localeCompare(b));
+const categoryCount = (category: string) => notes.filter(({ data }) => data.category === category).length;
 ---
 
 <BaseLayout
   title="Technical Notes"
   description="Public-domain engineering notes on power conversion, magnetics, digital control, wireless power, and lab practice."
+  bodyClass="notes-index-page"
 >
-  <header class="page-shell page-intro">
+  <header class="page-shell page-intro notes-intro">
     <div class="section-index">02 · Notes</div>
     <div>
       <h1 class="page-title">A technical notebook for <span class="serif">deep work.</span></h1>
-      <p class="page-lede">Field-oriented design notes, research questions, and reusable engineering methods.</p>
+      <p class="page-lede">Field-oriented design notes, research questions, and reusable engineering methods. The initial entries are explicitly marked editorial placeholders.</p>
     </div>
   </header>
+
+  <section class="notes-catalog section" aria-labelledby="catalog-heading">
+    <div class="page-shell">
+      <div class="catalog-heading">
+        <div>
+          <span class="eyebrow">Notebook index</span>
+          <h2 id="catalog-heading">Filter the signal.</h2>
+        </div>
+        <p>Search titles, summaries, categories, note types, and tags. Filters are encoded in the URL so this index is ready to share or extend.</p>
+      </div>
+
+      <form class="note-filters" data-note-filters role="search" aria-label="Filter technical notes">
+        <label class="search-field">
+          <span>Search notes</span>
+          <input data-note-search type="search" name="q" placeholder="architecture, magnetics, ZVS…" autocomplete="off" />
+          <i aria-hidden="true"></i>
+        </label>
+
+        <fieldset>
+          <legend>Category</legend>
+          <div class="filter-row">
+            <button type="button" data-category="all" aria-pressed="true">All <span>{notes.length}</span></button>
+            {noteCategories.map((category) => (
+              <button type="button" data-category={normalized(category)} aria-pressed="false">
+                {category} <span>{categoryCount(category)}</span>
+              </button>
+            ))}
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Tag</legend>
+          <div class="filter-row filter-row--tags">
+            <button type="button" data-tag="all" aria-pressed="true">All tags</button>
+            {allTags.map((tag) => <button type="button" data-tag={normalized(tag)} aria-pressed="false">{tag}</button>)}
+          </div>
+        </fieldset>
+
+        <div class="filter-status">
+          <p data-note-status aria-live="polite">Showing {notes.length} {notes.length === 1 ? 'note' : 'notes'}.</p>
+          <button type="reset" data-note-reset>Clear filters</button>
+        </div>
+      </form>
+
+      <ul class="notes-grid" data-note-list>
+        {
+          notes.map(({ id, data }) => (
+            <li
+              class:list={['note-item', data.featureSize]}
+              data-note
+              data-category={normalized(data.category)}
+              data-tags={data.tags.map(normalized).join('|')}
+              data-search={normalized([data.title, data.description, data.category, data.type, ...data.tags].join(' '))}
+            >
+              <NoteCard
+                href={hrefFor(id)}
+                title={data.title}
+                description={data.description}
+                category={data.category}
+                type={data.type}
+                date={data.date}
+                tags={data.tags}
+                visual={data.visual}
+                size={data.featureSize}
+                placeholder={data.placeholder}
+              />
+            </li>
+          ))
+        }
+      </ul>
+
+      <div class="empty-state" data-note-empty hidden>
+        <span>NO MATCH / ADJUST FIELD</span>
+        <p>No notes match the current search and filters.</p>
+        <button type="button" data-note-empty-reset>Reset the index</button>
+      </div>
+    </div>
+  </section>
+
+  <script>
+    const filterForm = document.querySelector<HTMLFormElement>('[data-note-filters]');
+
+    if (filterForm) {
+      const search = filterForm.querySelector<HTMLInputElement>('[data-note-search]');
+      const categoryButtons = [...filterForm.querySelectorAll<HTMLButtonElement>('[data-category]')];
+      const tagButtons = [...filterForm.querySelectorAll<HTMLButtonElement>('[data-tag]')];
+      const resetButton = filterForm.querySelector<HTMLButtonElement>('[data-note-reset]');
+      const emptyReset = document.querySelector<HTMLButtonElement>('[data-note-empty-reset]');
+      const items = [...document.querySelectorAll<HTMLElement>('[data-note]')];
+      const status = filterForm.querySelector<HTMLElement>('[data-note-status]');
+      const empty = document.querySelector<HTMLElement>('[data-note-empty]');
+      const params = new URLSearchParams(window.location.search);
+      let activeCategory = params.get('category')?.toLocaleLowerCase('en-US') || 'all';
+      let activeTag = params.get('tag')?.toLocaleLowerCase('en-US') || 'all';
+
+      if (!categoryButtons.some((button) => button.dataset.category === activeCategory)) activeCategory = 'all';
+      if (!tagButtons.some((button) => button.dataset.tag === activeTag)) activeTag = 'all';
+      if (search) search.value = params.get('q') || '';
+
+      const markActive = (buttons: HTMLButtonElement[], attribute: 'category' | 'tag', active: string) => {
+        buttons.forEach((button) => button.setAttribute('aria-pressed', String(button.dataset[attribute] === active)));
+      };
+
+      const applyFilters = () => {
+        const query = search?.value.trim().toLocaleLowerCase('en-US') || '';
+        let visible = 0;
+
+        items.forEach((item) => {
+          const categoryMatch = activeCategory === 'all' || item.dataset.category === activeCategory;
+          const tagMatch = activeTag === 'all' || (item.dataset.tags || '').split('|').includes(activeTag);
+          const searchMatch = !query || (item.dataset.search || '').includes(query);
+          const show = categoryMatch && tagMatch && searchMatch;
+          item.hidden = !show;
+          if (show) visible += 1;
+        });
+
+        markActive(categoryButtons, 'category', activeCategory);
+        markActive(tagButtons, 'tag', activeTag);
+        if (status) status.textContent = `Showing ${visible} ${visible === 1 ? 'note' : 'notes'}.`;
+        if (empty) empty.hidden = visible !== 0;
+
+        const nextParams = new URLSearchParams();
+        if (query) nextParams.set('q', query);
+        if (activeCategory !== 'all') nextParams.set('category', activeCategory);
+        if (activeTag !== 'all') nextParams.set('tag', activeTag);
+        const queryString = nextParams.toString();
+        window.history.replaceState({}, '', `${window.location.pathname}${queryString ? `?${queryString}` : ''}`);
+      };
+
+      const reset = () => {
+        activeCategory = 'all';
+        activeTag = 'all';
+        if (search) search.value = '';
+        applyFilters();
+        search?.focus();
+      };
+
+      categoryButtons.forEach((button) => button.addEventListener('click', () => {
+        activeCategory = button.dataset.category || 'all';
+        applyFilters();
+      }));
+      tagButtons.forEach((button) => button.addEventListener('click', () => {
+        activeTag = button.dataset.tag || 'all';
+        applyFilters();
+      }));
+      search?.addEventListener('input', applyFilters);
+      resetButton?.addEventListener('click', (event) => {
+        event.preventDefault();
+        reset();
+      });
+      emptyReset?.addEventListener('click', reset);
+      applyFilters();
+    }
+  </script>
 </BaseLayout>
+
+<style>
+  .notes-intro {
+    padding-bottom: clamp(78px, 10vw, 128px);
+  }
+
+  .notes-catalog {
+    padding-top: clamp(72px, 8vw, 108px);
+  }
+
+  .catalog-heading {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 430px);
+    gap: 42px;
+    align-items: end;
+    margin-bottom: 42px;
+  }
+
+  .catalog-heading h2 {
+    margin: 10px 0 0;
+    font-size: clamp(35px, 5vw, 62px);
+    font-weight: 485;
+    letter-spacing: -0.05em;
+    line-height: 1;
+  }
+
+  .catalog-heading p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+
+  .note-filters {
+    display: grid;
+    gap: 23px;
+    margin-bottom: 45px;
+    padding: 26px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--surface-hud);
+    box-shadow: var(--shadow-soft);
+    backdrop-filter: blur(14px);
+  }
+
+  .search-field {
+    position: relative;
+    display: grid;
+    gap: 7px;
+  }
+
+  .search-field > span,
+  legend {
+    color: var(--ink-micro);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 650;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+
+  .search-field input {
+    width: 100%;
+    height: 50px;
+    padding: 0 48px 0 0;
+    border: 0;
+    border-bottom: 1px solid var(--line-strong);
+    outline: 0;
+    background: transparent;
+    font-size: 17px;
+  }
+
+  .search-field input::placeholder {
+    color: var(--ink-faint);
+    opacity: 0.72;
+  }
+
+  .search-field input:focus {
+    border-color: var(--blue);
+  }
+
+  .search-field i {
+    position: absolute;
+    right: 7px;
+    bottom: 16px;
+    width: 18px;
+    height: 18px;
+    border: 1px solid var(--blue);
+    border-radius: 50%;
+    opacity: 0.65;
+    pointer-events: none;
+  }
+
+  .search-field i::after {
+    position: absolute;
+    right: -5px;
+    bottom: -3px;
+    width: 7px;
+    height: 1px;
+    transform: rotate(45deg);
+    background: var(--blue);
+    content: '';
+  }
+
+  fieldset {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  legend {
+    margin-bottom: 10px;
+  }
+
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+
+  .filter-row button {
+    min-height: 34px;
+    padding-inline: 13px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    color: var(--ink-soft);
+    background: rgb(255 255 255 / 0.22);
+    font-size: 11px;
+    cursor: pointer;
+    transition:
+      border-color var(--duration-fast) ease,
+      color var(--duration-fast) ease,
+      background var(--duration-fast) ease;
+  }
+
+  .filter-row--tags button {
+    min-height: 29px;
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .filter-row button span {
+    margin-left: 5px;
+    color: var(--ink-faint);
+    font-family: var(--font-mono);
+    font-size: 9px;
+  }
+
+  .filter-row button:hover,
+  .filter-row button[aria-pressed='true'] {
+    border-color: var(--line-strong);
+    color: var(--ink);
+    background: rgb(255 255 255 / 0.7);
+  }
+
+  .filter-row button[aria-pressed='true'] {
+    box-shadow: inset 0 0 0 1px rgb(105 127 156 / 0.12);
+  }
+
+  .filter-status {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 17px;
+    border-top: 1px solid var(--line);
+  }
+
+  .filter-status p {
+    margin: 0;
+    color: var(--ink-micro);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .filter-status button,
+  .empty-state button {
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid var(--line-strong);
+    background: transparent;
+    font-size: 11px;
+    font-weight: 620;
+    cursor: pointer;
+  }
+
+  .notes-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--grid-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .note-item {
+    min-width: 0;
+  }
+
+  .note-item.wide {
+    grid-column: span 7;
+  }
+
+  .note-item.narrow {
+    grid-column: span 5;
+  }
+
+  .note-item[hidden] {
+    display: none;
+  }
+
+  .note-item :global(.note-card) {
+    display: block;
+    height: 100%;
+  }
+
+  .empty-state {
+    padding: 64px 24px;
+    border-top: 1px solid var(--line-strong);
+    border-bottom: 1px solid var(--line);
+    text-align: center;
+  }
+
+  .empty-state[hidden] {
+    display: none;
+  }
+
+  .empty-state span {
+    color: var(--violet);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+  }
+
+  .empty-state p {
+    margin: 13px 0 18px;
+    color: var(--ink-soft);
+    font-size: 18px;
+  }
+
+  @media (max-width: 980px) {
+    .note-item.wide,
+    .note-item.narrow {
+      grid-column: span 6;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .catalog-heading {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    .note-filters {
+      padding: 20px;
+    }
+
+    .filter-status {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+
+    .note-item.wide,
+    .note-item.narrow {
+      grid-column: 1 / -1;
+    }
+  }
+</style>
