@@ -1,0 +1,210 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Page not found"
+  description="The requested coordinate is outside this engineering notebook."
+  bodyClass="not-found-page"
+>
+  <section class="not-found" aria-labelledby="not-found-heading">
+    <div class="page-shell not-found-grid">
+      <div class="error-copy">
+        <p class="error-status"><i></i> Navigation anomaly</p>
+        <p class="error-code" aria-hidden="true">404</p>
+        <h1 id="not-found-heading">This coordinate is outside the <em>known field.</em></h1>
+        <p class="error-message">
+          The page may have moved, or the address may be incomplete. Return to the main field or
+          continue through the technical notebook.
+        </p>
+        <div class="error-actions">
+          <a class="button primary" href="/">Return home <span aria-hidden="true">↗</span></a>
+          <a class="button" href="/notes/">Browse notes</a>
+        </div>
+      </div>
+
+      <div class="field-readout" aria-hidden="true">
+        <span class="field-grid"></span>
+        <span class="orbit orbit-a"></span>
+        <span class="orbit orbit-b"></span>
+        <span class="probe"></span>
+        <span class="crosshair crosshair-x"></span>
+        <span class="crosshair crosshair-y"></span>
+        <code>X / UNRESOLVED<br />Y / UNRESOLVED<br />SIGNAL / 0.00</code>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    align-items: center;
+    min-height: calc(100svh - var(--header-h) - 100px);
+    padding-block: clamp(72px, 10vw, 130px);
+  }
+
+  .not-found-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.08fr) minmax(330px, 0.92fr);
+    gap: clamp(46px, 8vw, 110px);
+    align-items: center;
+  }
+
+  .error-status {
+    display: inline-flex;
+    gap: 9px;
+    align-items: center;
+    margin: 0 0 28px;
+    color: var(--ink-micro);
+    font-size: 9px;
+    font-weight: 650;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .error-status i {
+    width: 6px;
+    height: 6px;
+    border: 1px solid var(--violet);
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgb(113 109 143 / 0.08), 0 0 16px rgb(113 109 143 / 0.32);
+  }
+
+  .error-code {
+    margin: 0 0 -7px;
+    color: transparent;
+    font-family: var(--font-mono);
+    font-size: clamp(74px, 11vw, 142px);
+    font-weight: 500;
+    letter-spacing: -0.1em;
+    line-height: 0.75;
+    -webkit-text-stroke: 1px rgb(51 65 86 / 0.22);
+  }
+
+  .error-copy h1 {
+    max-width: 780px;
+    margin: 0;
+    font-size: clamp(42px, 5.9vw, 78px);
+    font-weight: 480;
+    letter-spacing: -0.055em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  .error-copy h1 em {
+    color: var(--violet);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .error-message {
+    max-width: 610px;
+    margin: 28px 0 0;
+    color: var(--ink-soft);
+    font-size: 16px;
+  }
+
+  .error-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 36px;
+  }
+
+  .field-readout {
+    position: relative;
+    aspect-ratio: 1;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(249 250 247 / 0.82), rgb(228 234 232 / 0.38));
+    box-shadow: 0 28px 90px rgb(45 59 79 / 0.08);
+  }
+
+  .field-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgb(55 71 91 / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(55 71 91 / 0.05) 1px, transparent 1px);
+    background-size: 24px 24px;
+    mask-image: radial-gradient(circle, black, transparent 72%);
+  }
+
+  .orbit,
+  .probe,
+  .crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+  }
+
+  .orbit {
+    border: 1px solid rgb(105 127 156 / 0.26);
+    border-radius: 50%;
+  }
+
+  .orbit-a {
+    width: 72%;
+    height: 72%;
+    transform: translate(-50%, -50%) rotate(31deg) scaleY(0.38);
+    box-shadow: 0 0 0 24px rgb(105 127 156 / 0.025);
+  }
+
+  .orbit-b {
+    width: 50%;
+    height: 50%;
+    transform: translate(-50%, -50%) rotate(-43deg) scaleY(0.48);
+    border-color: rgb(113 109 143 / 0.23);
+  }
+
+  .probe {
+    width: 9px;
+    height: 9px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--violet);
+    box-shadow: 0 0 22px rgb(113 109 143 / 0.54);
+  }
+
+  .crosshair {
+    width: 86%;
+    height: 1px;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(90deg, transparent, rgb(51 65 86 / 0.2), transparent);
+  }
+
+  .crosshair-y { transform: translate(-50%, -50%) rotate(90deg); }
+
+  .field-readout code {
+    position: absolute;
+    right: 16%;
+    bottom: 13%;
+    color: var(--ink-faint);
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    line-height: 1.8;
+  }
+
+  @media (max-width: 860px) {
+    .not-found-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .field-readout {
+      width: min(100%, 460px);
+      margin-inline: auto;
+      grid-row: 1;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .field-readout {
+      width: 78vw;
+    }
+  }
+</style>

@@ -20,18 +20,31 @@ const updateScroll = () => {
 
 const closeMenu = () => {
   mobilePanel?.classList.remove('open');
+  mobilePanel?.setAttribute('aria-hidden', 'true');
+  mobilePanel?.setAttribute('inert', '');
   menuButton?.setAttribute('aria-expanded', 'false');
+  menuButton?.setAttribute('aria-label', 'Open navigation');
 };
 
 menuButton?.addEventListener('click', () => {
   const open = !mobilePanel?.classList.contains('open');
   mobilePanel?.classList.toggle('open', open);
   menuButton.setAttribute('aria-expanded', String(open));
+  menuButton.setAttribute('aria-label', open ? 'Close navigation' : 'Open navigation');
+  mobilePanel?.setAttribute('aria-hidden', String(!open));
+  if (open) mobilePanel?.removeAttribute('inert');
+  else mobilePanel?.setAttribute('inert', '');
 });
 
 mobilePanel?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') closeMenu();
+});
+
+document.addEventListener('pointerdown', (event) => {
+  if (!mobilePanel?.classList.contains('open')) return;
+  if (mobilePanel.contains(event.target as Node) || menuButton?.contains(event.target as Node)) return;
+  closeMenu();
 });
 
 ambientToggle?.addEventListener('click', () => {
@@ -64,6 +77,8 @@ if (!motionQuery.matches) {
 } else {
   document.querySelectorAll('.reveal').forEach((element) => element.classList.add('in-view'));
 }
+
+document.dispatchEvent(new Event('luminous:reveal-ready'));
 
 window.addEventListener('scroll', updateScroll, { passive: true });
 window.addEventListener('resize', updateScroll, { passive: true });

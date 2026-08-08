@@ -256,11 +256,16 @@ body::after {
 }
 
 .reveal {
-  transform: translateY(26px);
-  opacity: 0;
+  transform: none;
+  opacity: 1;
   transition:
     opacity var(--duration-slow) var(--ease-out),
     transform var(--duration-slow) var(--ease-out);
+}
+
+.js:not(.reveal-fallback) .reveal:not(.in-view) {
+  transform: translateY(26px);
+  opacity: 0;
 }
 
 .reveal.in-view {

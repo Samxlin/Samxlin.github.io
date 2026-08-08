@@ -18,7 +18,7 @@ const {
   title = 'Sam X. Lin',
   description = 'A public engineering notebook on high-frequency power conversion, magnetics, digital control, and wireless power.',
   canonical,
-  ogImage,
+  ogImage = '/og-luminous-field.jpg',
   ogType = 'website',
   lang = 'en',
   bodyClass,
@@ -34,6 +34,18 @@ const imageUrl = ogImage ? new URL(ogImage, Astro.site) : null;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      const revealFallback = window.setTimeout(
+        () => document.documentElement.classList.add('reveal-fallback'),
+        1600,
+      );
+      document.addEventListener(
+        'luminous:reveal-ready',
+        () => window.clearTimeout(revealFallback),
+        { once: true },
+      );
+    </script>
     <meta name="theme-color" content="#f2f4f1" />
     <meta name="generator" content={Astro.generator} />
     <title>{fullTitle}</title>

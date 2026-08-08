@@ -6,10 +6,10 @@
   --paper-3: #f8f8f5;
   --ink: #18202c;
   --ink-soft: #525c6c;
-  --ink-faint: #7c8592;
+  --ink-faint: #68707c;
   --ink-micro: #646d79;
 
-  --violet: #716d8f;
+  --violet: #6f6a8d;
   --blue: #697f9c;
   --teal: #769897;
   --mist: rgb(117 127 164 / 0.12);
@@ -63,8 +63,9 @@ body.moonlight {
   --paper-3: #f2f3f0;
   --ink: #17202b;
   --ink-soft: #4a5664;
-  --ink-faint: #75808b;
-  --violet: #666b8b;
+  --ink-faint: #606a76;
+  --ink-micro: #5f6975;
+  --violet: #646987;
   --teal: #6b8f91;
 }
 

@@ -8,11 +8,440 @@ import { profile } from '../data/profile';
     <div class="section-index">01 · About</div>
     <div>
       <h1 class="page-title">Research with an <span class="serif">engineering pulse.</span></h1>
-      <p class="page-lede">A concise view of the problems, methods, and technical fields that shape this notebook.</p>
+      <p class="page-lede">
+        A concise view of the questions and technical fields behind this public engineering
+        notebook. Unverified résumé details stay visibly unpublished.
+      </p>
     </div>
   </header>
 
-  <section class="section">
-    <div class="page-shell placeholder-note">Biography, experience, and education details are being verified before publication.</div>
+  <section class="section biography" aria-labelledby="biography-heading">
+    <div class="page-shell biography-grid">
+      <div class="section-label">
+        <span>Biography</span>
+        <code>PROFILE / 01</code>
+      </div>
+
+      <div class="biography-copy">
+        <h2 id="biography-heading">Engineer, researcher, <em>field observer.</em></h2>
+        <p>{profile.shortBio}</p>
+      </div>
+
+      <dl class="identity-ledger" aria-label="Verified profile facts">
+        <div>
+          <dt>Identity</dt>
+          <dd>{profile.headline}</dd>
+        </div>
+        <div>
+          <dt>Technical fields</dt>
+          <dd>{profile.technicalInterests.join(' · ')}</dd>
+        </div>
+        <div class:list={{ 'pending-row': !profile.location }}>
+          <dt>Location</dt>
+          <dd>
+            {
+              profile.location ? (
+                profile.location
+              ) : (
+                <><span>Not supplied</span><small>Pending</small></>
+              )
+            }
+          </dd>
+        </div>
+        <div>
+          <dt>Notebook role</dt>
+          <dd>Technical notes, publication index, and public engineering profile</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="section record-section" aria-labelledby="record-heading">
+    <div class="page-shell">
+      <div class="record-head">
+        <div class="section-label">
+          <span>Record</span>
+          <code>PROFILE / 02</code>
+        </div>
+        <div>
+          <h2 id="record-heading">Experience &amp; <em>education.</em></h2>
+          <p>These records are withheld until the underlying facts can be confirmed.</p>
+        </div>
+      </div>
+
+      <div class="record-grid">
+        <article class="record-card">
+          <div class="record-status"><span>Experience</span><small>Pending</small></div>
+          <h3>Not supplied</h3>
+          <p>Roles, organizations, dates, and responsibilities have not been provided.</p>
+          <code>DATA STATE / AWAITING VERIFIED INPUT</code>
+        </article>
+
+        <article class="record-card">
+          <div class="record-status"><span>Education</span><small>Pending</small></div>
+          <h3>Not supplied</h3>
+          <p>Institutions, degrees, fields of study, and dates have not been provided.</p>
+          <code>DATA STATE / AWAITING VERIFIED INPUT</code>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section interests-section" aria-labelledby="interests-heading">
+    <div class="page-shell">
+      <div class="interest-head">
+        <div class="section-label">
+          <span>Technical Interests</span>
+          <code>FIELD / 04</code>
+        </div>
+        <div>
+          <h2 id="interests-heading">The active <em>field map.</em></h2>
+          <p>Declared areas of technical interest from the public profile.</p>
+        </div>
+      </div>
+
+      <ol class="interest-grid">
+        {
+          profile.technicalInterests.map((interest, index) => (
+            <li>
+              <span class="interest-index">FIELD / {String(index + 1).padStart(2, '0')}</span>
+              <h3>{interest}</h3>
+              <span class="field-mark" aria-hidden="true"><i></i></span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
   </section>
 </BaseLayout>
+
+<style>
+  .section-label {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--ink-micro);
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .section-label code {
+    color: var(--ink-faint);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+  }
+
+  .biography-grid {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1.15fr) minmax(280px, 0.85fr);
+    gap: clamp(28px, 5vw, 72px);
+    align-items: start;
+  }
+
+  .biography-grid > .section-label {
+    display: grid;
+    gap: 6px;
+    justify-content: start;
+  }
+
+  .biography-copy h2,
+  .record-head h2,
+  .interest-head h2 {
+    margin: 0;
+    font-size: clamp(34px, 4.2vw, 58px);
+    font-weight: 480;
+    letter-spacing: -0.045em;
+    line-height: 1.04;
+    text-wrap: balance;
+  }
+
+  :is(.biography-copy, .record-head, .interest-head) h2 em {
+    color: var(--violet);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .biography-copy p {
+    max-width: 660px;
+    margin: 28px 0 0;
+    color: var(--ink-soft);
+    font-size: clamp(19px, 2.15vw, 29px);
+    letter-spacing: -0.02em;
+    line-height: 1.5;
+  }
+
+  .identity-ledger {
+    display: grid;
+    margin: 0;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .identity-ledger > div {
+    display: grid;
+    grid-template-columns: 108px minmax(0, 1fr);
+    gap: 16px;
+    padding: 17px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .identity-ledger dt {
+    color: var(--ink-faint);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .identity-ledger dd {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 13px;
+  }
+
+  .pending-row dd {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .pending-row small,
+  .record-status small {
+    display: inline-flex;
+    align-items: center;
+    min-height: 21px;
+    padding-inline: 8px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    color: var(--ink-micro);
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .record-head,
+  .interest-head {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr);
+    gap: clamp(28px, 5vw, 72px);
+    align-items: start;
+    margin-bottom: clamp(42px, 6vw, 72px);
+  }
+
+  :is(.record-head, .interest-head) > .section-label {
+    display: grid;
+    gap: 6px;
+    justify-content: start;
+    padding-top: 9px;
+  }
+
+  :is(.record-head, .interest-head) p {
+    max-width: 640px;
+    margin: 20px 0 0;
+    color: var(--ink-soft);
+    font-size: 16px;
+  }
+
+  .record-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+    padding-left: calc(150px + clamp(28px, 5vw, 72px));
+  }
+
+  .record-card {
+    position: relative;
+    min-height: 280px;
+    padding: clamp(26px, 4vw, 40px);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background:
+      linear-gradient(rgb(71 87 111 / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(71 87 111 / 0.035) 1px, transparent 1px),
+      var(--surface);
+    background-size: 28px 28px;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .record-card::after {
+    position: absolute;
+    top: -74px;
+    right: -62px;
+    width: 170px;
+    height: 170px;
+    border: 1px solid rgb(105 127 156 / 0.13);
+    border-radius: 50%;
+    box-shadow: 0 0 0 28px rgb(105 127 156 / 0.025);
+    content: "";
+  }
+
+  .record-status {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--ink-micro);
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .record-card h3 {
+    margin: 58px 0 8px;
+    font-size: clamp(26px, 3vw, 38px);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+  }
+
+  .record-card p {
+    max-width: 440px;
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+
+  .record-card > code {
+    position: absolute;
+    bottom: 25px;
+    left: clamp(26px, 4vw, 40px);
+    color: var(--ink-faint);
+    font-family: var(--font-mono);
+    font-size: 8px;
+    letter-spacing: 0.09em;
+  }
+
+  .interest-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    margin: 0;
+    padding: 1px;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background: var(--line);
+    box-shadow: var(--shadow-soft);
+    list-style: none;
+  }
+
+  .interest-grid li {
+    position: relative;
+    min-height: 220px;
+    padding: 26px 24px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .interest-index {
+    color: var(--ink-faint);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.09em;
+  }
+
+  .interest-grid h3 {
+    position: relative;
+    z-index: 1;
+    max-width: 190px;
+    margin: 78px 0 0;
+    font-size: clamp(19px, 2vw, 27px);
+    font-weight: 510;
+    letter-spacing: -0.025em;
+    line-height: 1.18;
+  }
+
+  .field-mark {
+    position: absolute;
+    top: 38px;
+    right: -35px;
+    width: 122px;
+    height: 122px;
+    transform: rotate(28deg) scaleY(0.46);
+    border: 1px solid rgb(113 109 143 / 0.18);
+    border-radius: 50%;
+  }
+
+  .field-mark::before,
+  .field-mark::after,
+  .field-mark i {
+    position: absolute;
+    border: 1px solid rgb(105 127 156 / 0.14);
+    border-radius: 50%;
+    content: "";
+  }
+
+  .field-mark::before { inset: 17px; }
+  .field-mark::after { inset: 34px; }
+  .field-mark i { inset: -18px; }
+
+  @media (max-width: 1040px) {
+    .biography-grid {
+      grid-template-columns: 130px minmax(0, 1fr);
+    }
+
+    .identity-ledger {
+      grid-column: 2;
+    }
+
+    .record-head,
+    .interest-head {
+      grid-template-columns: 130px minmax(0, 1fr);
+    }
+
+    .record-grid {
+      padding-left: calc(130px + clamp(28px, 5vw, 72px));
+    }
+
+    .interest-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 720px) {
+    .biography-grid,
+    .record-head,
+    .interest-head {
+      grid-template-columns: 1fr;
+    }
+
+    .identity-ledger {
+      grid-column: auto;
+    }
+
+    .record-grid {
+      grid-template-columns: 1fr;
+      padding-left: 0;
+    }
+
+    :is(.record-head, .interest-head) > .section-label {
+      padding-top: 0;
+    }
+  }
+
+  @media (max-width: 500px) {
+    .identity-ledger > div {
+      grid-template-columns: 88px minmax(0, 1fr);
+    }
+
+    .interest-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .interest-grid li {
+      min-height: 180px;
+    }
+
+    .interest-grid h3 {
+      margin-top: 58px;
+    }
+  }
+</style>

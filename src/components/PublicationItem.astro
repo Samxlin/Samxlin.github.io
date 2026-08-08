@@ -6,6 +6,9 @@ interface Props {
   title: string;
   authors?: string | string[];
   venue?: string;
+  volume?: string;
+  issue?: string;
+  pages?: string;
   note?: string;
   doi?: string;
   pdf?: string;
@@ -18,6 +21,9 @@ const {
   title,
   authors,
   venue,
+  volume,
+  issue,
+  pages,
   note,
   doi,
   pdf,
@@ -26,6 +32,13 @@ const {
 } = Astro.props;
 
 const authorsText = Array.isArray(authors) ? authors.join(', ') : authors;
+const citationDetails = [
+  venue,
+  volume ? `vol. ${volume}` : null,
+  issue ? `no. ${issue}` : null,
+  pages ? `pp. ${pages}` : null,
+  note,
+].filter(Boolean) as string[];
 
 const usableHref = (value?: string) => {
   const href = value?.trim();
@@ -55,11 +68,16 @@ const links = [
     <h3>{title}</h3>
     {authorsText && <p class="authors">{authorsText}</p>}
     {
-      (venue || note) && (
+      citationDetails.length > 0 && (
         <p class="details">
-          {venue && <span>{venue}</span>}
-          {venue && note && <span class="separator" aria-hidden="true">·</span>}
-          {note && <span>{note}</span>}
+          {
+            citationDetails.map((detail, index) => (
+              <>
+                {index > 0 && <span class="separator" aria-hidden="true">·</span>}
+                <span>{detail}</span>
+              </>
+            ))
+          }
         </p>
       )
     }

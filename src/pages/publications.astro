@@ -1,13 +1,367 @@
 ---
+import PublicationItem from '../components/PublicationItem.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { publications, type Publication } from '../data/publications';
+
+const groupedByYear = publications.reduce<Record<number, Publication[]>>((groups, publication) => {
+  (groups[publication.year] ??= []).push(publication);
+  return groups;
+}, {});
+
+const publicationGroups = Object.entries(groupedByYear)
+  .map(([year, entries]) => ({
+    year: Number(year),
+    entries: [...entries].sort((a, b) => a.title.localeCompare(b.title)),
+  }))
+  .sort((a, b) => b.year - a.year);
+
+const selectedCount = publications.filter((publication) => publication.selected).length;
 ---
 
-<BaseLayout title="Publications" description="Verified publications and research outputs by Sam X. Lin.">
+<BaseLayout
+  title="Publications"
+  description="A verification-first index of publications and research outputs by Sam X. Lin."
+>
   <header class="page-shell page-intro">
     <div class="section-index">03 · Publications</div>
     <div>
       <h1 class="page-title">Selected work, without the <span class="serif">CV wall.</span></h1>
-      <p class="page-lede">Publication metadata will appear here after titles, venues, and links have been verified.</p>
+      <p class="page-lede">
+        A precise, source-linked research record. Entries appear only after title, authorship,
+        venue, year, and links have been verified.
+      </p>
     </div>
   </header>
+
+  <section class="section publication-index" aria-labelledby="publication-index-heading">
+    <div class="page-shell">
+      <div class="index-head">
+        <div class="index-label">
+          <span>Research output</span>
+          <code>INDEX / VERIFIED</code>
+        </div>
+
+        <div class="index-copy">
+          <h2 id="publication-index-heading">Publication <em>index.</em></h2>
+          <p>Grouped by publication year when verified records are available.</p>
+        </div>
+
+        <dl class="index-readout" aria-label="Publication index summary">
+          <div><dt>Records</dt><dd>{String(publications.length).padStart(2, '0')}</dd></div>
+          <div><dt>Selected</dt><dd>{String(selectedCount).padStart(2, '0')}</dd></div>
+          <div><dt>State</dt><dd>{publications.length ? 'Published' : 'Pending input'}</dd></div>
+        </dl>
+      </div>
+
+      {
+        publicationGroups.length > 0 ? (
+          <div class="year-groups">
+            {publicationGroups.map((group) => (
+              <section class="year-group" aria-labelledby={`year-${group.year}`}>
+                <div class="year-heading">
+                  <h3 id={`year-${group.year}`}>{group.year}</h3>
+                  <span>{group.entries.length} {group.entries.length === 1 ? 'record' : 'records'}</span>
+                </div>
+                <div class="publication-list">
+                  {group.entries.map((publication) => (
+                    <PublicationItem
+                      year={publication.year}
+                      title={publication.title}
+                      authors={publication.authors}
+                      venue={publication.venue}
+                      volume={publication.volume}
+                      issue={publication.issue}
+                      pages={publication.pages}
+                      note={publication.note}
+                      doi={publication.doi}
+                      pdf={publication.pdf}
+                      bibtex={publication.bibtex}
+                      code={publication.code}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        ) : (
+          <div class="empty-state" role="status">
+            <div class="empty-field" aria-hidden="true">
+              <span class="orbit orbit-a"></span>
+              <span class="orbit orbit-b"></span>
+              <span class="origin"></span>
+              <i class="axis axis-x"></i>
+              <i class="axis axis-y"></i>
+            </div>
+            <div class="empty-copy">
+              <span class="empty-status"><i></i> Record pending verification</span>
+              <h3>No entries published <em>yet.</em></h3>
+              <p>
+                This index intentionally stays empty until publication metadata and source links
+                are supplied and checked. No sample papers or placeholder credentials are shown.
+              </p>
+              <code>AUTHORS / TITLE / VENUE / YEAR / SOURCE</code>
+            </div>
+          </div>
+        )
+      }
+    </div>
+  </section>
 </BaseLayout>
+
+<style>
+  .index-head {
+    display: grid;
+    grid-template-columns: 150px minmax(0, 1fr) 255px;
+    gap: clamp(28px, 5vw, 72px);
+    align-items: start;
+    margin-bottom: clamp(48px, 7vw, 82px);
+  }
+
+  .index-label {
+    display: grid;
+    gap: 6px;
+    padding-top: 9px;
+    color: var(--ink-micro);
+    font-size: 10px;
+    font-weight: 650;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  .index-label code,
+  .empty-copy code {
+    color: var(--ink-faint);
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 400;
+    letter-spacing: 0.09em;
+  }
+
+  .index-copy h2 {
+    margin: 0;
+    font-size: clamp(34px, 4.2vw, 58px);
+    font-weight: 480;
+    letter-spacing: -0.045em;
+    line-height: 1.04;
+  }
+
+  .index-copy h2 em,
+  .empty-copy h3 em {
+    color: var(--violet);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .index-copy p {
+    max-width: 620px;
+    margin: 18px 0 0;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+
+  .index-readout {
+    display: grid;
+    margin: 0;
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .index-readout > div {
+    display: flex;
+    gap: 20px;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .index-readout dt {
+    color: var(--ink-faint);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .index-readout dd {
+    margin: 0;
+    color: var(--ink-soft);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  .empty-state {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(280px, 0.82fr) minmax(0, 1.18fr);
+    min-height: 430px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-contact);
+    background:
+      linear-gradient(rgb(55 71 91 / 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(55 71 91 / 0.04) 1px, transparent 1px),
+      radial-gradient(circle at 18% 48%, rgb(113 109 143 / 0.13), transparent 24rem),
+      linear-gradient(135deg, rgb(249 250 247 / 0.78), rgb(228 234 232 / 0.58));
+    background-size: 30px 30px, 30px 30px, auto, auto;
+    box-shadow: 0 30px 100px rgb(45 59 79 / 0.08);
+  }
+
+  .empty-field {
+    position: relative;
+    min-height: 330px;
+  }
+
+  .orbit,
+  .origin,
+  .axis {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: block;
+  }
+
+  .orbit {
+    border: 1px solid rgb(105 127 156 / 0.23);
+    border-radius: 50%;
+  }
+
+  .orbit-a {
+    width: 230px;
+    height: 230px;
+    transform: translate(-50%, -50%) rotate(28deg) scaleY(0.4);
+    box-shadow: 0 0 0 28px rgb(105 127 156 / 0.025);
+  }
+
+  .orbit-b {
+    width: 150px;
+    height: 150px;
+    transform: translate(-50%, -50%) rotate(-41deg) scaleY(0.46);
+    border-color: rgb(113 109 143 / 0.22);
+  }
+
+  .origin {
+    width: 8px;
+    height: 8px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: var(--violet);
+    box-shadow: 0 0 22px rgb(113 109 143 / 0.58);
+  }
+
+  .axis {
+    width: 250px;
+    height: 1px;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(90deg, transparent, rgb(82 92 108 / 0.22), transparent);
+  }
+
+  .axis-y { transform: translate(-50%, -50%) rotate(90deg); }
+
+  .empty-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: clamp(34px, 6vw, 72px);
+    border-left: 1px solid var(--line);
+  }
+
+  .empty-status {
+    display: inline-flex;
+    gap: 9px;
+    align-items: center;
+    color: var(--ink-micro);
+    font-size: 9px;
+    font-weight: 650;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .empty-status i {
+    width: 6px;
+    height: 6px;
+    border: 1px solid var(--violet);
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px rgb(113 109 143 / 0.08);
+  }
+
+  .empty-copy h3 {
+    margin: 32px 0 16px;
+    font-size: clamp(32px, 4vw, 54px);
+    font-weight: 480;
+    letter-spacing: -0.045em;
+    line-height: 1.04;
+  }
+
+  .empty-copy p {
+    max-width: 600px;
+    margin: 0 0 42px;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+
+  .year-groups {
+    display: grid;
+    gap: clamp(72px, 9vw, 110px);
+  }
+
+  .year-heading {
+    display: flex;
+    gap: 24px;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 26px;
+  }
+
+  .year-heading h3 {
+    margin: 0;
+    color: var(--violet);
+    font-family: var(--font-serif);
+    font-size: clamp(40px, 5vw, 64px);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.04em;
+  }
+
+  .year-heading span {
+    color: var(--ink-faint);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .publication-list {
+    border-top: 1px solid var(--line-strong);
+  }
+
+  @media (max-width: 960px) {
+    .index-head {
+      grid-template-columns: 130px minmax(0, 1fr);
+    }
+
+    .index-readout {
+      grid-column: 2;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .index-head,
+    .empty-state {
+      grid-template-columns: 1fr;
+    }
+
+    .index-readout {
+      grid-column: auto;
+    }
+
+    .empty-field {
+      min-height: 250px;
+    }
+
+    .empty-copy {
+      border-top: 1px solid var(--line);
+      border-left: 0;
+    }
+  }
+</style>
