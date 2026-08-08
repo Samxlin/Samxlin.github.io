@@ -1,0 +1,1644 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f2f4f1" />
+  <meta name="description" content="A luminous, particle-driven personal homepage concept for Sam X. Lin, power electronics engineer and researcher." />
+  <title>Sam X. Lin — Luminous Field Concept</title>
+  <style>
+    :root {
+      --paper: #f2f4f1;
+      --paper-2: #eaeeec;
+      --paper-3: #f8f8f5;
+      --ink: #18202c;
+      --ink-soft: #525c6c;
+      --ink-faint: #7c8592;
+      --line: rgba(51, 65, 86, 0.16);
+      --line-strong: rgba(51, 65, 86, 0.28);
+      --violet: #716d8f;
+      --blue: #697f9c;
+      --teal: #769897;
+      --mist: rgba(117, 127, 164, 0.12);
+      --shadow: 0 22px 70px rgba(34, 48, 66, 0.10);
+      --radius: 22px;
+      --page: min(1180px, calc(100vw - 48px));
+      --article: 760px;
+      --header-h: 78px;
+      --mouse-x: 50%;
+      --mouse-y: 35%;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--paper);
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at var(--mouse-x) var(--mouse-y), rgba(131, 143, 182, 0.12), transparent 30rem),
+        radial-gradient(circle at 78% 11%, rgba(132, 158, 158, 0.13), transparent 27rem),
+        radial-gradient(circle at 19% 76%, rgba(147, 136, 168, 0.10), transparent 30rem),
+        linear-gradient(180deg, var(--paper-3) 0%, var(--paper) 46%, var(--paper-2) 100%);
+      font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      min-height: 100vh;
+      overflow-x: hidden;
+      text-rendering: optimizeLegibility;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -4;
+      pointer-events: none;
+      opacity: 0.52;
+      background-image:
+        linear-gradient(rgba(47, 62, 84, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(47, 62, 84, 0.035) 1px, transparent 1px);
+      background-size: 42px 42px;
+      mask-image: linear-gradient(to bottom, black, transparent 82%);
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 20;
+      pointer-events: none;
+      opacity: 0.025;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.92' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.72'/%3E%3C/svg%3E");
+      mix-blend-mode: multiply;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; color: inherit; }
+    ::selection { background: rgba(112, 116, 151, 0.18); }
+
+    .skip-link {
+      position: fixed;
+      top: 8px;
+      left: 8px;
+      z-index: 100;
+      padding: 10px 14px;
+      background: var(--ink);
+      color: white;
+      border-radius: 999px;
+      transform: translateY(-160%);
+      transition: transform .2s ease;
+    }
+    .skip-link:focus { transform: translateY(0); }
+
+    .progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      z-index: 90;
+      background: transparent;
+    }
+    .progress > span {
+      display: block;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--violet), var(--teal));
+      opacity: .65;
+      transform-origin: left center;
+    }
+
+    #field-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .site-header,
+    main,
+    footer,
+    .mobile-panel {
+      position: relative;
+      z-index: 1;
+    }
+
+    .page-shell {
+      width: var(--page);
+      margin-inline: auto;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      height: var(--header-h);
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid transparent;
+      transition: background .35s ease, border-color .35s ease, backdrop-filter .35s ease;
+    }
+
+    .site-header.scrolled {
+      background: rgba(244, 246, 243, 0.72);
+      border-color: var(--line);
+      backdrop-filter: blur(18px) saturate(125%);
+    }
+
+    .header-inner {
+      width: var(--page);
+      margin-inline: auto;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 22px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      min-width: max-content;
+      font-size: 12px;
+      line-height: 1;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      font-weight: 650;
+    }
+
+    .brand-mark {
+      position: relative;
+      width: 27px;
+      height: 27px;
+      border: 1px solid var(--line-strong);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.34);
+      box-shadow: inset 0 0 0 5px rgba(255,255,255,.18);
+    }
+    .brand-mark::before,
+    .brand-mark::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(87, 99, 126, .34);
+    }
+    .brand-mark::before { width: 15px; height: 7px; transform: rotate(28deg); }
+    .brand-mark::after { width: 7px; height: 15px; transform: rotate(28deg); }
+    .brand-mark i {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--ink);
+      box-shadow: 0 0 13px rgba(70, 88, 120, .55);
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(18px, 3vw, 38px);
+      font-size: 12px;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+    .nav a {
+      position: relative;
+      padding: 11px 0;
+      transition: color .25s ease;
+    }
+    .nav a::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 5px;
+      height: 1px;
+      background: currentColor;
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform .3s ease;
+    }
+    .nav a:hover,
+    .nav a.active { color: var(--ink); }
+    .nav a:hover::after,
+    .nav a.active::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    .header-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .round-button,
+    .menu-button {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.36);
+      backdrop-filter: blur(10px);
+      min-width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      display: inline-grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform .25s ease, border-color .25s ease, background .25s ease;
+    }
+    .round-button:hover,
+    .menu-button:hover {
+      transform: translateY(-2px);
+      border-color: var(--line-strong);
+      background: rgba(255,255,255,.66);
+    }
+    .round-button svg,
+    .menu-button svg { width: 16px; height: 16px; }
+    .menu-button { display: none; }
+
+    .hero {
+      min-height: calc(100svh - var(--header-h));
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(360px, .95fr);
+      align-items: center;
+      gap: clamp(32px, 7vw, 110px);
+      padding: clamp(54px, 8vh, 100px) 0 72px;
+      position: relative;
+    }
+
+    .hero-copy {
+      position: relative;
+      z-index: 2;
+      max-width: 720px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 11px;
+      margin: 0 0 24px;
+      color: var(--ink-soft);
+      font-size: 11px;
+      font-weight: 650;
+      letter-spacing: .19em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 34px;
+      height: 1px;
+      background: var(--line-strong);
+    }
+    .eyebrow .pulse {
+      position: relative;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--teal);
+      margin-left: 2px;
+    }
+    .eyebrow .pulse::after {
+      content: "";
+      position: absolute;
+      inset: -5px;
+      border: 1px solid rgba(118, 152, 151, .46);
+      border-radius: 50%;
+      animation: ping 2.4s ease-out infinite;
+    }
+    @keyframes ping {
+      0% { transform: scale(.5); opacity: 0; }
+      20% { opacity: 1; }
+      75%, 100% { transform: scale(1.45); opacity: 0; }
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    .hero h1 {
+      margin: 0;
+      max-width: 820px;
+      font-size: clamp(51px, 7.1vw, 104px);
+      line-height: .91;
+      letter-spacing: -.065em;
+      font-weight: 560;
+      text-wrap: balance;
+    }
+    .hero h1 .serif {
+      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Baskerville, Georgia, serif;
+      font-weight: 400;
+      font-style: italic;
+      letter-spacing: -.045em;
+      color: var(--violet);
+    }
+    .hero h1 .thin {
+      font-weight: 310;
+      color: var(--ink-soft);
+    }
+
+    .hero-lede {
+      max-width: 610px;
+      margin: 28px 0 0;
+      font-size: clamp(17px, 1.5vw, 20px);
+      color: var(--ink-soft);
+      line-height: 1.72;
+    }
+    .hero-lede strong { color: var(--ink); font-weight: 580; }
+    .hero-zh {
+      margin: 9px 0 0;
+      color: var(--ink-faint);
+      font-size: 14px;
+      letter-spacing: .04em;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 34px;
+    }
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 11px;
+      min-height: 48px;
+      padding: 0 19px;
+      border-radius: 999px;
+      border: 1px solid var(--line-strong);
+      font-size: 13px;
+      font-weight: 580;
+      letter-spacing: .015em;
+      transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+    }
+    .button.primary {
+      color: #f6f7f4;
+      background: linear-gradient(135deg, #333b4b, #667086);
+      border-color: transparent;
+      box-shadow: 0 14px 28px rgba(42, 52, 70, .16);
+    }
+    .button.secondary { background: rgba(255,255,255,.36); }
+    .button:hover { transform: translateY(-3px); }
+    .button.primary:hover { box-shadow: 0 18px 36px rgba(42, 52, 70, .22); }
+    .button svg { width: 15px; height: 15px; }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px 28px;
+      margin-top: 44px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line);
+      max-width: 610px;
+    }
+    .meta-item {
+      display: grid;
+      gap: 2px;
+    }
+    .meta-item span:first-child {
+      font-size: 10px;
+      color: var(--ink-faint);
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+    .meta-item span:last-child {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+
+    .field-stage {
+      position: relative;
+      min-height: 600px;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+    }
+
+    .field-halo {
+      width: min(42vw, 560px);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 46% 40%, rgba(255,255,255,.8) 0 9%, rgba(255,255,255,.16) 36%, transparent 64%),
+        radial-gradient(circle at 60% 56%, rgba(116, 134, 157, .15), transparent 48%);
+      filter: blur(1px);
+      box-shadow: inset 0 0 0 1px rgba(84, 100, 124, .08), 0 0 120px rgba(109, 126, 154, .10);
+      opacity: .82;
+    }
+
+    .hud {
+      position: absolute;
+      right: 2%;
+      bottom: 14%;
+      width: min(260px, 78%);
+      padding: 17px 18px 15px;
+      border: 1px solid rgba(67, 83, 105, .18);
+      background: rgba(247, 248, 245, .54);
+      backdrop-filter: blur(18px) saturate(120%);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      color: var(--ink-soft);
+      pointer-events: auto;
+      transform: translateZ(0);
+    }
+    .hud-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 10px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid var(--line);
+      font-size: 9px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+    }
+    .hud-head b { color: var(--ink); font-weight: 650; }
+    .hud-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: center;
+      font-size: 11px;
+      margin-top: 7px;
+    }
+    .hud-row code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      color: var(--ink);
+      font-size: 11px;
+    }
+    .hud-bars {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 3px;
+      height: 18px;
+      align-items: end;
+      margin-top: 13px;
+    }
+    .hud-bars i {
+      display: block;
+      height: calc((var(--n) + 2) * 1px);
+      max-height: 18px;
+      border-radius: 2px;
+      background: linear-gradient(to top, rgba(89, 104, 132, .2), rgba(89, 104, 132, .72));
+      transform-origin: bottom;
+      animation: bar 2.7s ease-in-out infinite alternate;
+      animation-delay: calc(var(--n) * -110ms);
+    }
+    @keyframes bar { to { transform: scaleY(.44); opacity: .55; } }
+
+    .scroll-cue {
+      position: absolute;
+      left: 0;
+      bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink-faint);
+      font-size: 10px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+    .scroll-cue::before {
+      content: "";
+      width: 42px;
+      height: 1px;
+      background: var(--line-strong);
+      animation: breathe 2.1s ease-in-out infinite;
+      transform-origin: left;
+    }
+    @keyframes breathe { 50% { transform: scaleX(.55); opacity: .45; } }
+
+    main { position: relative; }
+
+    .section {
+      position: relative;
+      padding: clamp(100px, 12vw, 170px) 0;
+      scroll-margin-top: calc(var(--header-h) + 18px);
+    }
+
+    .section::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 50%;
+      width: min(1180px, calc(100% - 48px));
+      transform: translateX(-50%);
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--line-strong), transparent);
+    }
+
+    .section-head {
+      display: grid;
+      grid-template-columns: 150px minmax(0, 1fr);
+      gap: clamp(28px, 5vw, 74px);
+      align-items: start;
+      margin-bottom: clamp(48px, 7vw, 88px);
+    }
+    .section-index {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--ink-faint);
+      font-size: 10px;
+      letter-spacing: .17em;
+      text-transform: uppercase;
+      padding-top: 11px;
+    }
+    .section-index::after {
+      content: "";
+      width: 36px;
+      height: 1px;
+      background: var(--line-strong);
+    }
+    .section-title h2 {
+      margin: 0;
+      font-size: clamp(36px, 5.2vw, 70px);
+      line-height: 1;
+      letter-spacing: -.05em;
+      font-weight: 480;
+      text-wrap: balance;
+    }
+    .section-title h2 em {
+      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Baskerville, Georgia, serif;
+      font-weight: 400;
+      color: var(--violet);
+    }
+    .section-title p {
+      max-width: 670px;
+      margin: 20px 0 0;
+      color: var(--ink-soft);
+      font-size: 17px;
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: clamp(32px, 7vw, 96px);
+      align-items: start;
+    }
+    .about-copy {
+      max-width: 700px;
+      font-size: clamp(20px, 2.25vw, 31px);
+      line-height: 1.45;
+      letter-spacing: -.025em;
+      color: #343d4a;
+    }
+    .about-copy strong { color: var(--ink); font-weight: 570; }
+    .about-copy .serif {
+      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Baskerville, Georgia, serif;
+      font-style: italic;
+      color: var(--violet);
+    }
+    .about-aside {
+      display: grid;
+      gap: 0;
+      border-top: 1px solid var(--line-strong);
+    }
+    .fact {
+      display: grid;
+      grid-template-columns: 110px 1fr;
+      gap: 16px;
+      padding: 17px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .fact dt {
+      margin: 0;
+      color: var(--ink-faint);
+      font-size: 10px;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+    .fact dd { margin: 0; color: var(--ink-soft); }
+
+    .interest-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      margin-top: clamp(60px, 9vw, 100px);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--line);
+      box-shadow: 0 20px 70px rgba(52, 67, 88, .05);
+    }
+    .interest {
+      position: relative;
+      min-height: 190px;
+      padding: 24px;
+      background: rgba(247, 248, 245, .62);
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+    }
+    .interest::after {
+      content: "";
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      right: -60px;
+      bottom: -70px;
+      border-radius: 50%;
+      border: 1px solid rgba(92, 105, 133, .15);
+      box-shadow: 0 0 0 13px rgba(92, 105, 133, .035), 0 0 0 27px rgba(92, 105, 133, .025);
+      transition: transform .5s ease;
+    }
+    .interest:hover::after { transform: scale(1.16) translate(-8px,-8px); }
+    .interest small {
+      display: block;
+      color: var(--ink-faint);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 10px;
+      letter-spacing: .1em;
+      margin-bottom: 32px;
+    }
+    .interest h3 {
+      max-width: 180px;
+      margin: 0 0 10px;
+      font-size: 20px;
+      line-height: 1.15;
+      letter-spacing: -.025em;
+      font-weight: 580;
+    }
+    .interest p {
+      max-width: 190px;
+      margin: 0;
+      color: var(--ink-faint);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 22px;
+    }
+
+    .note-card {
+      position: relative;
+      min-height: 410px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(248, 249, 246, .62);
+      backdrop-filter: blur(14px);
+      overflow: hidden;
+      transform-style: preserve-3d;
+      transition: border-color .35s ease, box-shadow .35s ease;
+      will-change: transform;
+    }
+    .note-card:hover {
+      border-color: rgba(60, 76, 99, .3);
+      box-shadow: var(--shadow);
+    }
+    .note-card.large { grid-column: span 7; }
+    .note-card.small { grid-column: span 5; }
+    .note-card .visual {
+      height: 205px;
+      border-bottom: 1px solid var(--line);
+      position: relative;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 68% 24%, rgba(123, 139, 170, .15), transparent 34%),
+        linear-gradient(135deg, rgba(255,255,255,.45), rgba(223, 229, 229, .35));
+      transform: translateZ(14px);
+    }
+    .note-card .visual::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(64, 78, 99, .045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(64, 78, 99, .045) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+    .note-card svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+    .note-card .content {
+      position: relative;
+      padding: 24px 25px 27px;
+      transform: translateZ(20px);
+    }
+    .note-card .kicker {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--ink-faint);
+      font-size: 9px;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .note-card .kicker b {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--blue);
+      box-shadow: 0 0 0 5px rgba(105, 127, 156, .08);
+    }
+    .note-card h3 {
+      max-width: 560px;
+      margin: 0;
+      font-size: clamp(23px, 2.3vw, 34px);
+      line-height: 1.15;
+      letter-spacing: -.035em;
+      font-weight: 535;
+    }
+    .note-card p {
+      margin: 13px 0 0;
+      color: var(--ink-soft);
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 520px;
+    }
+    .note-card .arrow {
+      position: absolute;
+      right: 22px;
+      bottom: 22px;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.3);
+      transition: transform .3s ease, background .3s ease;
+    }
+    .note-card:hover .arrow { transform: translate(3px, -3px); background: rgba(255,255,255,.65); }
+    .note-card .arrow svg { position: static; width: 14px; height: 14px; }
+
+    .trace {
+      stroke-dasharray: 8 11;
+      animation: dash 12s linear infinite;
+    }
+    @keyframes dash { to { stroke-dashoffset: -220; } }
+    .signal-dot { animation: signal 3.3s ease-in-out infinite; }
+    @keyframes signal {
+      0%, 100% { opacity: .2; transform: scale(.85); }
+      50% { opacity: 1; transform: scale(1.25); }
+    }
+
+    .notes-footer {
+      margin-top: 34px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 24px;
+      color: var(--ink-faint);
+      font-size: 12px;
+    }
+    .text-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--ink);
+      font-weight: 580;
+    }
+    .text-link span {
+      width: 30px;
+      height: 1px;
+      background: currentColor;
+      transition: width .3s ease;
+    }
+    .text-link:hover span { width: 44px; }
+
+    .publications {
+      border-top: 1px solid var(--line-strong);
+    }
+    .pub {
+      display: grid;
+      grid-template-columns: 95px 1fr auto;
+      gap: 24px;
+      align-items: start;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--line);
+      transition: padding-left .3s ease, background .3s ease;
+    }
+    .pub:hover { padding-left: 12px; }
+    .pub-year {
+      color: var(--ink-faint);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      padding-top: 4px;
+    }
+    .pub h3 {
+      margin: 0 0 8px;
+      font-size: clamp(20px, 2.15vw, 29px);
+      line-height: 1.25;
+      letter-spacing: -.025em;
+      font-weight: 520;
+    }
+    .pub p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 13px;
+    }
+    .pub-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 7px;
+      padding-top: 2px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 29px;
+      padding: 0 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink-soft);
+      background: rgba(255,255,255,.28);
+      font-size: 10px;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      transition: background .25s ease, border-color .25s ease;
+    }
+    .chip:hover { background: rgba(255,255,255,.7); border-color: var(--line-strong); }
+
+    .contact-card {
+      position: relative;
+      min-height: 430px;
+      display: grid;
+      grid-template-columns: 1.18fr .82fr;
+      gap: 60px;
+      align-items: end;
+      padding: clamp(35px, 6vw, 74px);
+      border: 1px solid var(--line);
+      border-radius: 32px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 84% 18%, rgba(121, 137, 165, .18), transparent 26rem),
+        linear-gradient(135deg, rgba(249,250,247,.8), rgba(228,234,232,.62));
+      box-shadow: 0 30px 100px rgba(45, 59, 79, .08);
+    }
+    .contact-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(55, 71, 91, .045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(55, 71, 91, .045) 1px, transparent 1px);
+      background-size: 30px 30px;
+      mask-image: radial-gradient(circle at 75% 30%, black, transparent 66%);
+    }
+    .contact-copy,
+    .contact-links { position: relative; z-index: 1; }
+    .contact-copy h2 {
+      margin: 0 0 20px;
+      max-width: 700px;
+      font-size: clamp(42px, 6vw, 78px);
+      line-height: .98;
+      letter-spacing: -.055em;
+      font-weight: 470;
+    }
+    .contact-copy h2 em {
+      font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Baskerville, Georgia, serif;
+      font-weight: 400;
+      color: var(--violet);
+    }
+    .contact-copy p {
+      max-width: 620px;
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 15px;
+    }
+    .contact-links {
+      display: grid;
+      align-content: end;
+      border-top: 1px solid var(--line-strong);
+    }
+    .contact-links a {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--line);
+      color: var(--ink-soft);
+      font-size: 13px;
+      transition: color .25s ease, padding-left .25s ease;
+    }
+    .contact-links a:hover { color: var(--ink); padding-left: 8px; }
+    .contact-links span:last-child { color: var(--ink-faint); }
+
+    footer {
+      padding: 40px 0 56px;
+      color: var(--ink-faint);
+      font-size: 11px;
+    }
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: center;
+    }
+    .footer-inner code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 10px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(26px);
+      transition: opacity .85s cubic-bezier(.22,1,.36,1), transform .85s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal.in-view { opacity: 1; transform: none; }
+    .delay-1 { transition-delay: 90ms; }
+    .delay-2 { transition-delay: 180ms; }
+    .delay-3 { transition-delay: 270ms; }
+
+    .mobile-panel {
+      position: fixed;
+      top: calc(var(--header-h) - 1px);
+      left: 16px;
+      right: 16px;
+      z-index: 49;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(244, 246, 243, .92);
+      backdrop-filter: blur(20px);
+      box-shadow: var(--shadow);
+      opacity: 0;
+      transform: translateY(-12px) scale(.98);
+      pointer-events: none;
+      transition: opacity .25s ease, transform .25s ease;
+    }
+    .mobile-panel.open { opacity: 1; transform: none; pointer-events: auto; }
+    .mobile-panel a {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 10px;
+      border-bottom: 1px solid var(--line);
+      color: var(--ink-soft);
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .mobile-panel a:last-child { border-bottom: 0; }
+
+    body.moonlight {
+      --paper: #e9ecec;
+      --paper-2: #dfe4e4;
+      --paper-3: #f2f3f0;
+      --ink: #17202b;
+      --ink-soft: #4a5664;
+      --ink-faint: #75808b;
+      --violet: #666b8b;
+      --teal: #6b8f91;
+    }
+
+    @media (max-width: 980px) {
+      :root { --page: min(100% - 36px, 920px); }
+      .header-inner { grid-template-columns: 1fr auto; }
+      .nav { display: none; }
+      .menu-button { display: inline-grid; }
+      .hero {
+        grid-template-columns: 1fr;
+        min-height: auto;
+        padding-top: 76px;
+      }
+      .hero-copy { max-width: 820px; }
+      .field-stage {
+        min-height: 440px;
+        margin-top: -60px;
+      }
+      .field-halo { width: min(76vw, 560px); }
+      .hud { right: 6%; bottom: 8%; }
+      .scroll-cue { display: none; }
+      .interest-strip { grid-template-columns: repeat(2, 1fr); }
+      .note-card.large,
+      .note-card.small { grid-column: span 6; }
+      .contact-card { grid-template-columns: 1fr; gap: 50px; }
+    }
+
+    @media (max-width: 720px) {
+      :root {
+        --page: calc(100% - 28px);
+        --header-h: 68px;
+      }
+      .brand span:last-child { display: none; }
+      .round-button { display: none; }
+      .hero { padding-top: 46px; }
+      .hero h1 { font-size: clamp(48px, 16vw, 78px); }
+      .hero-lede { font-size: 16px; }
+      .hero-meta { gap: 16px 22px; }
+      .field-stage { min-height: 370px; margin-top: -34px; }
+      .hud { width: 220px; right: 0; bottom: 2%; }
+      .section { padding: 96px 0; }
+      .section::before { width: calc(100% - 28px); }
+      .section-head { grid-template-columns: 1fr; gap: 20px; }
+      .section-index { padding-top: 0; }
+      .about-grid { grid-template-columns: 1fr; }
+      .interest-strip { grid-template-columns: 1fr; }
+      .interest { min-height: 150px; }
+      .note-card.large,
+      .note-card.small { grid-column: 1 / -1; }
+      .notes-grid { gap: 16px; }
+      .note-card { min-height: 390px; }
+      .pub { grid-template-columns: 68px 1fr; gap: 16px; }
+      .pub-tags { grid-column: 2; justify-content: flex-start; }
+      .contact-card { min-height: 0; padding: 30px 24px; border-radius: 24px; }
+      .footer-inner { align-items: flex-start; flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .001ms !important;
+      }
+      #field-canvas { display: none; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="progress" aria-hidden="true"><span></span></div>
+  <canvas id="field-canvas" aria-hidden="true"></canvas>
+
+  <header class="site-header" id="site-header">
+    <div class="header-inner">
+      <a class="brand" href="#top" aria-label="Sam X. Lin home">
+        <span class="brand-mark" aria-hidden="true"><i></i></span>
+        <span>Sam X. Lin</span>
+      </a>
+
+      <nav class="nav" aria-label="Primary navigation">
+        <a href="#about">About</a>
+        <a href="#notes">Technical Notes</a>
+        <a href="#publications">Publications</a>
+        <a href="#contact">Contact</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="round-button" id="ambient-toggle" type="button" aria-label="Toggle ambient tone" title="Toggle ambient tone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">
+            <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.64 5.64l1.42 1.42M16.94 16.94l1.42 1.42M18.36 5.64l-1.42 1.42M7.06 16.94l-1.42 1.42"/>
+            <circle cx="12" cy="12" r="4"/>
+          </svg>
+        </button>
+        <button class="menu-button" id="menu-button" type="button" aria-label="Open menu" aria-expanded="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 8h14M5 16h14"/></svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="mobile-panel" id="mobile-panel">
+    <a href="#about"><span>About</span><span>01</span></a>
+    <a href="#notes"><span>Technical Notes</span><span>02</span></a>
+    <a href="#publications"><span>Publications</span><span>03</span></a>
+    <a href="#contact"><span>Contact</span><span>04</span></a>
+  </div>
+
+  <main id="main">
+    <section class="hero page-shell" id="top">
+      <div class="hero-copy">
+        <p class="eyebrow reveal in-view"><span>Power Electronics · Research & Engineering</span><i class="pulse" aria-hidden="true"></i></p>
+        <h1 class="reveal in-view delay-1">
+          Engineering<br />the <span class="serif">invisible</span><br /><span class="thin">fields.</span>
+        </h1>
+        <p class="hero-lede reveal in-view delay-2">
+          I explore <strong>high-frequency power conversion</strong>, magnetic structures and digital control—turning invisible electromagnetic behavior into efficient, repeatable engineering.
+        </p>
+        <p class="hero-zh reveal in-view delay-2">在功率、磁场与控制之间，寻找更高效、更优雅的结构。</p>
+        <div class="hero-actions reveal in-view delay-3">
+          <a class="button primary" href="#notes">
+            Explore technical notes
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M5 12h14M14 7l5 5-5 5"/></svg>
+          </a>
+          <a class="button secondary" href="#publications">Selected publications</a>
+        </div>
+        <div class="hero-meta reveal in-view delay-3">
+          <div class="meta-item"><span>Focus</span><span>HF conversion / magnetics</span></div>
+          <div class="meta-item"><span>Mode</span><span>research × engineering</span></div>
+          <div class="meta-item"><span>Notebook</span><span>concept // 00.1</span></div>
+        </div>
+      </div>
+
+      <div class="field-stage" aria-hidden="true">
+        <div class="field-halo"></div>
+        <div class="hud">
+          <div class="hud-head"><b>Resonant field</b><span id="hud-status">stable</span></div>
+          <div class="hud-row"><span>carrier</span><code id="hud-frequency">1.000 MHz</code></div>
+          <div class="hud-row"><span>phase orbit</span><code id="hud-phase">+37.2°</code></div>
+          <div class="hud-row"><span>field density</span><code id="hud-density">0.86</code></div>
+          <div class="hud-bars" aria-hidden="true">
+            <i style="--n:5"></i><i style="--n:10"></i><i style="--n:7"></i><i style="--n:14"></i><i style="--n:9"></i><i style="--n:16"></i><i style="--n:12"></i><i style="--n:6"></i><i style="--n:13"></i><i style="--n:8"></i><i style="--n:15"></i><i style="--n:11"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="scroll-cue">Scroll to enter the notebook</div>
+    </section>
+
+    <section class="section" id="about">
+      <div class="page-shell">
+        <div class="section-head reveal">
+          <div class="section-index">01 · About</div>
+          <div class="section-title">
+            <h2>Research with an <em>engineering pulse.</em></h2>
+            <p>A personal site should not feel like a frozen résumé. It should reveal how a person frames problems, builds models and turns experiments into reusable knowledge.</p>
+          </div>
+        </div>
+
+        <div class="about-grid">
+          <div class="about-copy reveal">
+            My work sits where <strong>converter architectures</strong>, <span class="serif">electromagnetic fields</span>, switching behavior and control meet. I care about first-principles models—but also about what survives PCB parasitics, thermal limits and a real lab bench.
+          </div>
+          <dl class="about-aside reveal delay-1">
+            <div class="fact"><dt>Identity</dt><dd>Power electronics engineer & researcher</dd></div>
+            <div class="fact"><dt>Research</dt><dd>High-frequency conversion, planar magnetics, wireless power</dd></div>
+            <div class="fact"><dt>Practice</dt><dd>Architecture · modeling · simulation · measurement</dd></div>
+            <div class="fact"><dt>Site role</dt><dd>Public notebook, publication index and technical identity</dd></div>
+          </dl>
+        </div>
+
+        <div class="interest-strip reveal">
+          <article class="interest">
+            <small>FIELD / 01</small>
+            <h3>Power Conversion</h3>
+            <p>DCX · LLC · DAB · PPP · HSC · extreme conversion ratio</p>
+          </article>
+          <article class="interest">
+            <small>FIELD / 02</small>
+            <h3>Power Magnetics</h3>
+            <p>Planar transformer · matrix transformer · AC loss · field shaping</p>
+          </article>
+          <article class="interest">
+            <small>FIELD / 03</small>
+            <h3>Digital Control</h3>
+            <p>Sampling delay · loop shaping · MCU / DSP · measurement</p>
+          </article>
+          <article class="interest">
+            <small>FIELD / 04</small>
+            <h3>Wireless Power</h3>
+            <p>MHz resonance · ZVS · synchronous rectification · compensation</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="notes">
+      <div class="page-shell">
+        <div class="section-head reveal">
+          <div class="section-index">02 · Notes</div>
+          <div class="section-title">
+            <h2>A technical notebook for <em>deep work.</em></h2>
+            <p>Each article begins with a sharp engineering question, builds a model, then ends with practical implications—not generic “knowledge sharing.”</p>
+          </div>
+        </div>
+
+        <div class="notes-grid">
+          <a class="note-card large tilt reveal" href="#" aria-label="Read note: 800 V to 6 V power conversion">
+            <div class="visual">
+              <svg viewBox="0 0 720 220" fill="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="g1" x1="116" y1="110" x2="610" y2="110" gradientUnits="userSpaceOnUse"><stop stop-color="#53657e" stop-opacity=".18"/><stop offset=".5" stop-color="#6e7596" stop-opacity=".75"/><stop offset="1" stop-color="#6f9292" stop-opacity=".25"/></linearGradient>
+                  <filter id="soft"><feGaussianBlur stdDeviation="5"/></filter>
+                </defs>
+                <path d="M76 109H644" stroke="#596a82" stroke-opacity=".2"/>
+                <path class="trace" d="M103 110C186 29 261 190 350 110C438 30 514 189 616 110" stroke="url(#g1)" stroke-width="1.7"/>
+                <rect x="76" y="75" width="84" height="70" rx="12" fill="#f5f6f3" fill-opacity=".65" stroke="#53657e" stroke-opacity=".35"/>
+                <rect x="318" y="62" width="96" height="96" rx="16" fill="#f5f6f3" fill-opacity=".66" stroke="#6e7596" stroke-opacity=".42"/>
+                <rect x="574" y="82" width="70" height="56" rx="12" fill="#f5f6f3" fill-opacity=".65" stroke="#6f9292" stroke-opacity=".38"/>
+                <text x="118" y="106" text-anchor="middle" fill="#303948" font-size="13" font-family="ui-monospace, monospace">800 V</text>
+                <text x="118" y="124" text-anchor="middle" fill="#76808b" font-size="8" font-family="ui-monospace, monospace">BUS</text>
+                <text x="366" y="104" text-anchor="middle" fill="#303948" font-size="13" font-family="ui-monospace, monospace">DCX</text>
+                <text x="366" y="122" text-anchor="middle" fill="#76808b" font-size="8" font-family="ui-monospace, monospace">FIELD LINK</text>
+                <text x="609" y="107" text-anchor="middle" fill="#303948" font-size="13" font-family="ui-monospace, monospace">6 V</text>
+                <text x="609" y="124" text-anchor="middle" fill="#76808b" font-size="8" font-family="ui-monospace, monospace">LOAD</text>
+                <circle class="signal-dot" cx="243" cy="110" r="4" fill="#6e7596"/>
+                <circle cx="366" cy="110" r="46" stroke="#6e7596" stroke-opacity=".16"/>
+                <circle cx="366" cy="110" r="58" stroke="#6e7596" stroke-opacity=".07"/>
+                <ellipse cx="366" cy="110" rx="82" ry="25" stroke="#6e7596" stroke-opacity=".17" transform="rotate(-18 366 110)"/>
+                <circle cx="366" cy="110" r="7" fill="#6e7596" fill-opacity=".14" filter="url(#soft)"/>
+              </svg>
+            </div>
+            <div class="content">
+              <div class="kicker"><span>Power Conversion · Deep Dive</span><b></b></div>
+              <h3>800 V → 6 V: architecture before topology</h3>
+              <p>How fixed-ratio DCX, partial-power processing and magnetic partitioning reshape an extreme conversion-ratio problem.</p>
+              <span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19 19 5M9 5h10v10"/></svg></span>
+            </div>
+          </a>
+
+          <a class="note-card small tilt reveal delay-1" href="#" aria-label="Read note: planar transformer stackup">
+            <div class="visual">
+              <svg viewBox="0 0 520 220" fill="none" aria-hidden="true">
+                <g transform="translate(82 38)">
+                  <path d="M18 20H344L378 38H52L18 20Z" fill="#667a95" fill-opacity=".14" stroke="#5e708a" stroke-opacity=".28"/>
+                  <path d="M18 49H344L378 67H52L18 49Z" fill="#77708d" fill-opacity=".12" stroke="#6d6684" stroke-opacity=".28"/>
+                  <path d="M18 78H344L378 96H52L18 78Z" fill="#668e8c" fill-opacity=".12" stroke="#668e8c" stroke-opacity=".28"/>
+                  <path d="M18 107H344L378 125H52L18 107Z" fill="#77708d" fill-opacity=".12" stroke="#6d6684" stroke-opacity=".28"/>
+                  <path d="M18 136H344L378 154H52L18 136Z" fill="#667a95" fill-opacity=".14" stroke="#5e708a" stroke-opacity=".28"/>
+                  <path class="trace" d="M65 31H324M65 60H324M65 89H324M65 118H324M65 147H324" stroke="#4f6079" stroke-opacity=".45" stroke-width="1.4"/>
+                  <path d="M198 12V164" stroke="#5b6680" stroke-opacity=".2" stroke-dasharray="3 7"/>
+                </g>
+                <text x="28" y="199" fill="#77808c" font-size="9" font-family="ui-monospace, monospace" letter-spacing="1.5">MMF / LEAKAGE / ELECTRIC FIELD</text>
+              </svg>
+            </div>
+            <div class="content">
+              <div class="kicker"><span>Power Magnetics · Design Note</span><b></b></div>
+              <h3>How to read a 20-layer PCB transformer</h3>
+              <p>Start from MMF distribution, leakage-field location and electric-field stress—not from “how should I wind it?”</p>
+              <span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19 19 5M9 5h10v10"/></svg></span>
+            </div>
+          </a>
+
+          <a class="note-card small tilt reveal" href="#" aria-label="Read note: digital control bandwidth">
+            <div class="visual">
+              <svg viewBox="0 0 520 220" fill="none" aria-hidden="true">
+                <path d="M48 176H470M48 29V176" stroke="#56677e" stroke-opacity=".24"/>
+                <path d="M48 72H470M48 122H470M148 29V176M260 29V176M372 29V176" stroke="#56677e" stroke-opacity=".08"/>
+                <path d="M52 65C128 62 173 68 224 86C278 105 336 124 467 153" stroke="#5c6f8a" stroke-width="1.8"/>
+                <path class="trace" d="M52 105C127 104 184 96 235 76C284 58 340 56 467 74" stroke="#766f90" stroke-opacity=".75" stroke-width="1.5"/>
+                <path d="M275 36V176" stroke="#708c8e" stroke-opacity=".45" stroke-dasharray="5 7"/>
+                <circle class="signal-dot" cx="275" cy="101" r="4" fill="#708c8e"/>
+                <text x="278" y="28" fill="#70808b" font-size="9" font-family="ui-monospace, monospace">DELAY LIMIT</text>
+                <text x="54" y="198" fill="#77808c" font-size="9" font-family="ui-monospace, monospace" letter-spacing="1.5">FREQUENCY →</text>
+              </svg>
+            </div>
+            <div class="content">
+              <div class="kicker"><span>Digital Control · Lab Note</span><b></b></div>
+              <h3>Where a Type-III compensator stops helping</h3>
+              <p>Sampling, computation and PWM update delay set a harder bandwidth limit than the compensator algebra suggests.</p>
+              <span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19 19 5M9 5h10v10"/></svg></span>
+            </div>
+          </a>
+
+          <a class="note-card large tilt reveal delay-1" href="#" aria-label="Read note: load-insensitive ZVS">
+            <div class="visual">
+              <svg viewBox="0 0 720 220" fill="none" aria-hidden="true">
+                <defs><radialGradient id="g2"><stop stop-color="#71858e" stop-opacity=".32"/><stop offset="1" stop-color="#71858e" stop-opacity="0"/></radialGradient></defs>
+                <circle cx="360" cy="110" r="76" fill="url(#g2)"/>
+                <circle cx="360" cy="110" r="62" stroke="#6b758f" stroke-opacity=".28"/>
+                <circle cx="360" cy="110" r="45" stroke="#6b758f" stroke-opacity=".2"/>
+                <ellipse cx="360" cy="110" rx="174" ry="53" stroke="#6e8292" stroke-opacity=".34" transform="rotate(7 360 110)"/>
+                <ellipse class="trace" cx="360" cy="110" rx="174" ry="53" stroke="#6e8292" stroke-opacity=".65" stroke-width="1.2" transform="rotate(-18 360 110)"/>
+                <ellipse cx="360" cy="110" rx="125" ry="37" stroke="#786f8f" stroke-opacity=".25" transform="rotate(52 360 110)"/>
+                <path d="M106 110H245M476 110H614" stroke="#596a82" stroke-opacity=".26"/>
+                <path d="M113 92C131 92 131 128 149 128C167 128 167 92 185 92C203 92 203 128 221 128" stroke="#596a82" stroke-opacity=".64"/>
+                <path d="M499 92C517 92 517 128 535 128C553 128 553 92 571 92C589 92 589 128 607 128" stroke="#596a82" stroke-opacity=".64"/>
+                <circle class="signal-dot" cx="360" cy="110" r="5" fill="#6e8292"/>
+                <text x="360" y="114" text-anchor="middle" fill="#303948" font-size="11" font-family="ui-monospace, monospace">ZVS</text>
+              </svg>
+            </div>
+            <div class="content">
+              <div class="kicker"><span>Wireless Power · Research Note</span><b></b></div>
+              <h3>What load-insensitive ZVS actually means</h3>
+              <p>A field-oriented view of impedance trajectories, charge balance and why the light-load boundary is often the real design constraint.</p>
+              <span class="arrow" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M5 19 19 5M9 5h10v10"/></svg></span>
+            </div>
+          </a>
+        </div>
+
+        <div class="notes-footer reveal">
+          <span>Deep dives · design notes · lab notes · research notes</span>
+          <a class="text-link" href="#">View the full notebook <span aria-hidden="true"></span></a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="publications">
+      <div class="page-shell">
+        <div class="section-head reveal">
+          <div class="section-index">03 · Publications</div>
+          <div class="section-title">
+            <h2>Selected work, without the <em>CV wall.</em></h2>
+            <p>The publication page should remain academic and precise, while the homepage only shows work that best explains your technical identity.</p>
+          </div>
+        </div>
+
+        <div class="publications reveal">
+          <article class="pub">
+            <div class="pub-year">TPEL</div>
+            <div>
+              <h3>Load Insensitivity Design for a 6.78-MHz kW-Level IPT System Using Bridge Topology</h3>
+              <p>High-frequency impedance design · soft-switching boundary · experimental validation</p>
+            </div>
+            <div class="pub-tags"><a class="chip" href="#">DOI</a><a class="chip" href="#">PDF</a><a class="chip" href="#">BibTeX</a></div>
+          </article>
+          <article class="pub">
+            <div class="pub-year">TIE</div>
+            <div>
+              <h3>High-Frequency Synchronous Rectification and Resonant Drive for MHz Wireless Power</h3>
+              <p>Phase synchronization · device transition behavior · high-frequency implementation</p>
+            </div>
+            <div class="pub-tags"><a class="chip" href="#">DOI</a><a class="chip" href="#">PDF</a></div>
+          </article>
+          <article class="pub">
+            <div class="pub-year">THESIS</div>
+            <div>
+              <h3>Control and Resonant Design Methods for Megahertz Wireless Power Transfer Systems</h3>
+              <p>Bridge-based ZVS · TPS control · efficiency tracking · integrated magnetics</p>
+            </div>
+            <div class="pub-tags"><a class="chip" href="#">Abstract</a><a class="chip" href="#">PDF</a></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contact">
+      <div class="page-shell">
+        <div class="contact-card reveal">
+          <div class="contact-copy">
+            <p class="eyebrow">04 · Contact</p>
+            <h2>Let the next idea find a <em>resonant path.</em></h2>
+            <p>For technical discussion, research collaboration and thoughtful engineering conversations. Company-confidential implementation details remain outside this public notebook.</p>
+          </div>
+          <div class="contact-links">
+            <a href="mailto:hello@example.com"><span>Email</span><span>hello@example.com ↗</span></a>
+            <a href="#"><span>GitHub</span><span>@samxlin ↗</span></a>
+            <a href="#"><span>Google Scholar</span><span>Research profile ↗</span></a>
+            <a href="#"><span>ORCID</span><span>0000-0000-0000-0000 ↗</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="page-shell footer-inner">
+      <span>© 2026 Sam X. Lin · A luminous-field homepage concept</span>
+      <code>STATIC / ACCESSIBLE / NO EXTERNAL LIBRARIES</code>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const canvas = document.getElementById('field-canvas');
+      const ctx = canvas.getContext('2d', { alpha: true });
+      const header = document.getElementById('site-header');
+      const progress = document.querySelector('.progress > span');
+      const navLinks = [...document.querySelectorAll('.nav a')];
+      const sections = [...document.querySelectorAll('main section[id]')];
+      const ambientToggle = document.getElementById('ambient-toggle');
+      const menuButton = document.getElementById('menu-button');
+      const mobilePanel = document.getElementById('mobile-panel');
+      const motionOK = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      let w = 0;
+      let h = 0;
+      let dpr = 1;
+      let pointer = { x: window.innerWidth * .74, y: window.innerHeight * .42, tx: window.innerWidth * .74, ty: window.innerHeight * .42 };
+      let scrollY = window.scrollY;
+      let frame = 0;
+      let quietMode = false;
+      let raf = null;
+
+      const torus = [];
+      const dust = [];
+      const rings = 20;
+      const perRing = 23;
+
+      for (let r = 0; r < rings; r++) {
+        for (let i = 0; i < perRing; i++) {
+          torus.push({
+            u: (i / perRing) * Math.PI * 2 + (r % 2) * .06,
+            v: (r / rings) * Math.PI * 2,
+            seed: Math.random() * Math.PI * 2,
+            drift: .78 + Math.random() * .45,
+            size: .55 + Math.random() * 1.35,
+            family: Math.random()
+          });
+        }
+      }
+
+      for (let i = 0; i < 92; i++) {
+        dust.push({
+          x: Math.random(), y: Math.random(), z: Math.random(),
+          vx: (Math.random() - .5) * .00008,
+          vy: (Math.random() - .5) * .00006,
+          size: .35 + Math.random() * 1.1,
+          alpha: .04 + Math.random() * .13
+        });
+      }
+
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 1.75);
+        w = window.innerWidth;
+        h = window.innerHeight;
+        canvas.width = Math.floor(w * dpr);
+        canvas.height = Math.floor(h * dpr);
+        canvas.style.width = `${w}px`;
+        canvas.style.height = `${h}px`;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      function rotate3D(x, y, z, ax, ay, az) {
+        let cy = Math.cos(ax), sy = Math.sin(ax);
+        let y1 = y * cy - z * sy;
+        let z1 = y * sy + z * cy;
+        y = y1; z = z1;
+
+        let cx = Math.cos(ay), sx = Math.sin(ay);
+        let x1 = x * cx + z * sx;
+        let z2 = -x * sx + z * cx;
+        x = x1; z = z2;
+
+        let cz = Math.cos(az), sz = Math.sin(az);
+        let x2 = x * cz - y * sz;
+        let y2 = x * sz + y * cz;
+        return [x2, y2, z];
+      }
+
+      function render(t) {
+        const time = t * 0.001;
+        frame++;
+        ctx.clearRect(0, 0, w, h);
+
+        pointer.x += (pointer.tx - pointer.x) * .055;
+        pointer.y += (pointer.ty - pointer.y) * .055;
+
+        // Quiet drifting dust establishes depth without making the page feel dark.
+        for (const p of dust) {
+          p.x += p.vx * (quietMode ? .4 : 1);
+          p.y += p.vy * (quietMode ? .4 : 1);
+          if (p.x < -.03) p.x = 1.03;
+          if (p.x > 1.03) p.x = -.03;
+          if (p.y < -.03) p.y = 1.03;
+          if (p.y > 1.03) p.y = -.03;
+          const px = p.x * w + Math.sin(time * .12 + p.z * 8) * 7;
+          const py = p.y * h + Math.cos(time * .1 + p.z * 9) * 5;
+          ctx.beginPath();
+          ctx.arc(px, py, p.size, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(66,82,108,${p.alpha})`;
+          ctx.fill();
+        }
+
+        const isMobile = w < 980;
+        const centerX = isMobile ? w * .53 : w * .745;
+        const centerY = isMobile ? h * .62 : h * .46;
+        const base = Math.min(w, h) * (isMobile ? .31 : .285);
+        const R = base * .76;
+        const r = base * .32;
+        const scrollPhase = Math.min(scrollY / Math.max(h, 1), 2.4);
+        const rotY = time * (quietMode ? .035 : .065) + scrollPhase * .10;
+        const rotX = -.44 + Math.sin(time * .12) * .055 + scrollPhase * .04;
+        const rotZ = .22 + Math.cos(time * .08) * .045;
+        const fieldAlpha = isMobile ? .56 : .72;
+        const projected = [];
+
+        for (const p of torus) {
+          const pulse = 1 + Math.sin(time * .72 + p.seed) * .028;
+          const wobble = Math.sin(p.u * 3 + time * .28 + p.seed) * base * .018;
+          let x = (R * pulse + r * Math.cos(p.v + time * .055 * p.drift)) * Math.cos(p.u) + wobble;
+          let y = r * Math.sin(p.v + time * .055 * p.drift);
+          let z = (R * pulse + r * Math.cos(p.v + time * .055 * p.drift)) * Math.sin(p.u);
+          [x, y, z] = rotate3D(x, y, z, rotX, rotY, rotZ);
+          const perspective = 1 / (1 + z / (base * 4.1));
+          let px = centerX + x * perspective;
+          let py = centerY + y * perspective;
+
+          const dx = px - pointer.x;
+          const dy = py - pointer.y;
+          const dist2 = dx * dx + dy * dy;
+          const influence = Math.max(0, 1 - dist2 / 36000);
+          const dist = Math.sqrt(dist2) || 1;
+          px += (dx / dist) * influence * 16;
+          py += (dy / dist) * influence * 16;
+
+          projected.push({ x: px, y: py, z, perspective, size: p.size, family: p.family, influence });
+        }
+
+        projected.sort((a, b) => a.z - b.z);
+
+        // Sparse field-line connections. These are deliberately selective: the visual reads as a field, not a network diagram.
+        ctx.lineWidth = .55;
+        for (let i = 0; i < projected.length; i += 23) {
+          const a = projected[i];
+          const b = projected[(i + 5) % projected.length];
+          if (!a || !b) continue;
+          const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+          grad.addColorStop(0, 'rgba(80,97,126,.035)');
+          grad.addColorStop(.5, 'rgba(105,101,137,.12)');
+          grad.addColorStop(1, 'rgba(91,126,127,.025)');
+          ctx.strokeStyle = grad;
+          ctx.beginPath();
+          ctx.moveTo(a.x, a.y);
+          ctx.quadraticCurveTo((a.x + b.x) / 2 + 12, (a.y + b.y) / 2 - 10, b.x, b.y);
+          ctx.stroke();
+        }
+
+        for (const p of projected) {
+          const depth = Math.max(.18, Math.min(1, .58 - p.z / (base * 2.5)));
+          const alpha = fieldAlpha * depth * (quietMode ? .72 : 1) + p.influence * .15;
+          const radius = p.size * p.perspective * (1 + p.influence * .45);
+          let color;
+          if (p.family < .28) color = `rgba(92,119,122,${alpha * .75})`;
+          else if (p.family < .63) color = `rgba(77,94,122,${alpha})`;
+          else color = `rgba(105,96,132,${alpha * .82})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.fill();
+        }
+
+        // The luminous core is restrained and stays nearly white.
+        const core = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, base * .48);
+        core.addColorStop(0, 'rgba(255,255,252,.43)');
+        core.addColorStop(.2, 'rgba(166,177,194,.08)');
+        core.addColorStop(1, 'rgba(166,177,194,0)');
+        ctx.fillStyle = core;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, base * .48, 0, Math.PI * 2);
+        ctx.fill();
+
+        if (motionOK) raf = requestAnimationFrame(render);
+      }
+
+      function updateScroll() {
+        scrollY = window.scrollY;
+        header.classList.toggle('scrolled', scrollY > 18);
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const ratio = max > 0 ? scrollY / max : 0;
+        progress.style.width = `${Math.min(100, Math.max(0, ratio * 100))}%`;
+
+        let active = '';
+        for (const section of sections) {
+          const top = section.offsetTop - window.innerHeight * .34;
+          if (scrollY >= top) active = section.id;
+        }
+        navLinks.forEach(link => link.classList.toggle('active', link.getAttribute('href') === `#${active}`));
+      }
+
+      window.addEventListener('pointermove', (e) => {
+        pointer.tx = e.clientX;
+        pointer.ty = e.clientY;
+        root.style.setProperty('--mouse-x', `${(e.clientX / w) * 100}%`);
+        root.style.setProperty('--mouse-y', `${(e.clientY / h) * 100}%`);
+      }, { passive: true });
+
+      window.addEventListener('scroll', updateScroll, { passive: true });
+      window.addEventListener('resize', resize, { passive: true });
+
+      ambientToggle.addEventListener('click', () => {
+        quietMode = !quietMode;
+        document.body.classList.toggle('moonlight', quietMode);
+        document.getElementById('hud-status').textContent = quietMode ? 'quiet' : 'stable';
+      });
+
+      menuButton.addEventListener('click', () => {
+        const open = mobilePanel.classList.toggle('open');
+        menuButton.setAttribute('aria-expanded', String(open));
+      });
+      mobilePanel.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+        mobilePanel.classList.remove('open');
+        menuButton.setAttribute('aria-expanded', 'false');
+      }));
+
+      const revealObserver = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            revealObserver.unobserve(entry.target);
+          }
+        }
+      }, { threshold: .12, rootMargin: '0px 0px -5% 0px' });
+      document.querySelectorAll('.reveal:not(.in-view)').forEach(el => revealObserver.observe(el));
+
+      document.querySelectorAll('.tilt').forEach(card => {
+        card.addEventListener('pointermove', (e) => {
+          if (window.innerWidth < 780 || !motionOK) return;
+          const rect = card.getBoundingClientRect();
+          const x = (e.clientX - rect.left) / rect.width - .5;
+          const y = (e.clientY - rect.top) / rect.height - .5;
+          card.style.transform = `perspective(900px) rotateX(${y * -3.5}deg) rotateY(${x * 4.2}deg) translateY(-3px)`;
+        });
+        card.addEventListener('pointerleave', () => { card.style.transform = ''; });
+      });
+
+      // Small live values: enough motion to feel instrument-like, not dashboard-like.
+      setInterval(() => {
+        const t = Date.now() / 1000;
+        document.getElementById('hud-phase').textContent = `${(34 + Math.sin(t * .42) * 4.3).toFixed(1)}°`;
+        document.getElementById('hud-density').textContent = (0.83 + Math.sin(t * .31) * .035).toFixed(2);
+        document.getElementById('hud-frequency').textContent = `${(1 + Math.sin(t * .18) * .0008).toFixed(3)} MHz`;
+      }, 460);
+
+      resize();
+      updateScroll();
+      if (motionOK) raf = requestAnimationFrame(render);
+      else render(0);
+
+      window.addEventListener('beforeunload', () => { if (raf) cancelAnimationFrame(raf); });
+    })();
+  </script>
+</body>
+</html>
