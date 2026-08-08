@@ -1,0 +1,18 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { profile } from '../data/profile';
+---
+
+<BaseLayout title="About" description={`About ${profile.name}, ${profile.headline}.`}>
+  <header class="page-shell page-intro">
+    <div class="section-index">01 · About</div>
+    <div>
+      <h1 class="page-title">Research with an <span class="serif">engineering pulse.</span></h1>
+      <p class="page-lede">A concise view of the problems, methods, and technical fields that shape this notebook.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="page-shell placeholder-note">Biography, experience, and education details are being verified before publication.</div>
+  </section>
+</BaseLayout>

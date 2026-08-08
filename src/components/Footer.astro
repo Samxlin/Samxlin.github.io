@@ -1,0 +1,41 @@
+---
+import { profile } from '../data/profile';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="page-shell footer-inner">
+    <span>© {year} {profile.name} · Luminous Field notebook</span>
+    <code>STATIC / ACCESSIBLE / FIELD-ORIENTED</code>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    z-index: 1;
+    padding: 40px 0 56px;
+    color: var(--ink-micro);
+    font-size: 11px;
+  }
+
+  .footer-inner {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 10px;
+  }
+
+  @media (max-width: 720px) {
+    .footer-inner {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+  }
+</style>

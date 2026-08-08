@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://samxlin.github.io/sitemap-index.xml

@@ -1,0 +1,83 @@
+:root {
+  color-scheme: light;
+
+  --paper: #f2f4f1;
+  --paper-2: #eaeeec;
+  --paper-3: #f8f8f5;
+  --ink: #18202c;
+  --ink-soft: #525c6c;
+  --ink-faint: #7c8592;
+  --ink-micro: #646d79;
+
+  --violet: #716d8f;
+  --blue: #697f9c;
+  --teal: #769897;
+  --mist: rgb(117 127 164 / 0.12);
+
+  --line: rgb(51 65 86 / 0.16);
+  --line-strong: rgb(51 65 86 / 0.28);
+  --surface: rgb(248 249 246 / 0.62);
+  --surface-strong: rgb(248 249 246 / 0.84);
+  --surface-hud: rgb(247 248 245 / 0.58);
+  --surface-button: rgb(255 255 255 / 0.36);
+
+  --shadow-float: 0 22px 70px rgb(34 48 66 / 0.1);
+  --shadow-soft: 0 20px 70px rgb(52 67 88 / 0.05);
+  --shadow-button: 0 14px 28px rgb(42 52 70 / 0.16);
+
+  --radius-card: 22px;
+  --radius-hud: 16px;
+  --radius-contact: 32px;
+  --radius-pill: 999px;
+
+  --container: 1180px;
+  --article: 780px;
+  --page: min(var(--container), calc(100vw - 48px));
+  --header-h: 78px;
+  --section-y: clamp(100px, 12vw, 170px);
+  --grid-gap: 22px;
+
+  --font-sans: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", Arial,
+    sans-serif;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Baskerville,
+    Georgia, serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --text-hero: clamp(51px, 7.1vw, 104px);
+  --text-section: clamp(36px, 5.2vw, 70px);
+  --text-card-title: clamp(23px, 2.3vw, 34px);
+
+  --duration-fast: 180ms;
+  --duration-base: 280ms;
+  --duration-slow: 850ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --mouse-x: 50%;
+  --mouse-y: 35%;
+}
+
+body.moonlight {
+  --paper: #e9ecec;
+  --paper-2: #dfe4e4;
+  --paper-3: #f2f3f0;
+  --ink: #17202b;
+  --ink-soft: #4a5664;
+  --ink-faint: #75808b;
+  --violet: #666b8b;
+  --teal: #6b8f91;
+}
+
+@media (max-width: 980px) {
+  :root {
+    --page: min(calc(100% - 36px), 920px);
+  }
+}
+
+@media (max-width: 720px) {
+  :root {
+    --page: calc(100% - 28px);
+    --header-h: 68px;
+    --section-y: 96px;
+  }
+}

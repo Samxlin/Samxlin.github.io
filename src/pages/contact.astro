@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { profileLinks } from '../data/profile';
+---
+
+<BaseLayout title="Contact" description="Contact and verified public profiles for Sam X. Lin.">
+  <header class="page-shell page-intro">
+    <div class="section-index">04 · Contact</div>
+    <div>
+      <h1 class="page-title">Let the next idea find a <span class="serif">resonant path.</span></h1>
+      <p class="page-lede">For thoughtful engineering discussion. Unverified contact details remain clearly marked.</p>
+    </div>
+  </header>
+
+  <section class="section">
+    <div class="page-shell link-list">
+      {
+        profileLinks.map((item) =>
+          item.href ? (
+            <a href={item.href} target={item.href.startsWith('http') ? '_blank' : undefined} rel={item.href.startsWith('http') ? 'noreferrer' : undefined}>
+              <span>{item.label}</span><span>{item.value} ↗</span>
+            </a>
+          ) : (
+            <div><span>{item.label}</span><span>{item.value}</span></div>
+          ),
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .link-list {
+    border-top: 1px solid var(--line-strong);
+  }
+
+  .link-list :is(a, div) {
+    display: flex;
+    gap: 24px;
+    justify-content: space-between;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .link-list span:last-child {
+    color: var(--ink-micro);
+  }
+</style>

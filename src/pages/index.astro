@@ -1,0 +1,48 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { profile } from '../data/profile';
+---
+
+<BaseLayout title={profile.name} description={profile.shortBio} bodyClass="home-page">
+  <section class="page-shell foundation-hero">
+    <div>
+      <p class="eyebrow">Power Electronics · Research & Engineering</p>
+      <h1>Engineering<br />the <span class="serif">invisible</span><br /><span>fields.</span></h1>
+      <p>{profile.shortBio}</p>
+      <a class="button primary" href="/notes/">Explore technical notes <span aria-hidden="true">→</span></a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .foundation-hero {
+    display: grid;
+    min-height: calc(100svh - var(--header-h));
+    align-items: center;
+    padding-block: 72px;
+  }
+
+  .foundation-hero > div {
+    max-width: 760px;
+  }
+
+  h1 {
+    margin: 22px 0 30px;
+    font-size: var(--text-hero);
+    font-weight: 560;
+    letter-spacing: -0.065em;
+    line-height: 0.91;
+  }
+
+  h1 > span:last-child {
+    color: var(--ink-soft);
+    font-weight: 310;
+  }
+
+  p:not(.eyebrow) {
+    max-width: 610px;
+    margin-bottom: 32px;
+    color: var(--ink-soft);
+    font-size: 19px;
+  }
+</style>
